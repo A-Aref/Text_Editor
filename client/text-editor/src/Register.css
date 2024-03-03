@@ -1,0 +1,24 @@
+
+#RegisterPage {
+    margin: 0;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 90vh;
+}
+
+
+
+#register {
+    width: 350px;
+    border: 1px solid;
+    padding: 20px;
+    
+  }
+
+  #register_fields{
+    text-align: left;
+  }

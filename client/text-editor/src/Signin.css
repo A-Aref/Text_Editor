@@ -1,0 +1,24 @@
+#SigninPage {
+  margin: 2rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+
+
+#login {
+  width: 350px;
+  border: 1px solid;
+  padding: 20px;
+}
+
+
+#errorText{
+  color: rgb(197, 6, 6);
+}
+
+
