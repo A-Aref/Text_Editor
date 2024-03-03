@@ -7,6 +7,7 @@ import Stack from "react-bootstrap/Stack";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
@@ -20,10 +21,23 @@ import IconButton from "@mui/material/IconButton";
 
 function Docs() {
   const [docs, setDocs] = useState([
-    { Title: "sales.txt", Role: "Owner" },
-    { Title: "sales3.txt", Role: "Editor" },
-    { Title: "sales1.txt", Role: "Owner" },
-    { Title: "sales4.txt", Role: "Viewer" },
+    { Title: "sales.txt", Role: "Owner", Desc: "Beahebak" },
+    { Title: "sales3.txt", Role: "Editor", Desc: "Beahebak" },
+    { Title: "sales1.txt", Role: "Owner", Desc: "Beahebak" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "Beahebak" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "Beahebak" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "Beahebak" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "Beahebak" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "Beahebak" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "Beahebak" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "Beahebak" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "Beahebak" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "Beahebak" },
+    {
+      Title: "sales4.txt",
+      Role: "Viewer",
+      Desc: "BeahebakBeahebakBeahebakBeahebakBeahebakBeahebakBeahebakBeahebakBeahebakBakBebakBeahebakBeahebakBeahebakBeahebakBeahebakBeahebakBeahebakBeahebakBeahebakBakBebak",
+    },
   ]);
 
   const renderTooltip = (props) => (
@@ -54,20 +68,40 @@ function Docs() {
               </div>
             </Row>
             <Row>
-              <Stack className="mt-3" gap={2}>
+              <div className="documents">
                 {docs.map((doc, key) => {
                   if (doc.Role === "Owner") {
                     return (
-                      <div className="documents">
-                        <h1>{doc.Title}</h1>
-                        <IconButton style={{ color: "white" }}>
-                          <MoreVertIcon fontSize="large" />
-                        </IconButton>
-                      </div>
+                      <Card className="document">
+                        <Card.Body>
+                          <Card.Title>
+                            <div
+                              style={{
+                                justifyContent: "space-between",
+                                display: "flex",
+                              }}
+                            >
+                              <h2>{doc.Title}</h2>
+                              <IconButton style={{ color: "white" }}>
+                                <MoreVertIcon fontSize="medium" />
+                              </IconButton>
+                            </div>
+                          </Card.Title>
+                          <Card.Text
+                            style={{
+                              overflowY: "auto",
+                              height: "10vh",
+                              scrollbarWidth: "none",
+                            }}
+                          >
+                            {doc.Desc}
+                          </Card.Text>
+                        </Card.Body>
+                      </Card>
                     );
                   }
                 })}
-              </Stack>
+              </div>
             </Row>
           </Col>
           <Col>
@@ -77,26 +111,46 @@ function Docs() {
               </h1>
             </Row>
             <Row>
-              <Stack className="mt-3" gap={2}>
+              <div className="documents">
                 {docs.map((doc, key) => {
                   if (doc.Role !== "Owner") {
                     return (
-                      <div className="documents">
-                        <h1>{doc.Title}</h1>
-                        {doc.Role === "Viewer" ? (
-                          <IconButton style={{ color: "white" }}>
-                            <MoreVertIcon fontSize="large" />
-                          </IconButton>
-                        ) : (
-                          <IconButton style={{ color: "white" }} disabled>
-                            <VisibilityIcon fontSize="large" />
-                          </IconButton>
-                        )}
-                      </div>
+                      <Card className="document">
+                        <Card.Body>
+                          <Card.Title>
+                            <div
+                              style={{
+                                justifyContent: "space-between",
+                                display: "flex",
+                              }}
+                            >
+                              <h2>{doc.Title}</h2>
+                              {doc.Role === "Viewer" ? (
+                                <IconButton style={{ color: "white" }} disabled>
+                                  <VisibilityIcon fontSize="medium" />
+                                </IconButton>
+                              ) : (
+                                <IconButton style={{ color: "white" }}>
+                                  <MoreVertIcon fontSize="medium" />
+                                </IconButton>
+                              )}
+                            </div>
+                          </Card.Title>
+                          <Card.Text
+                            style={{
+                              overflowY: "auto",
+                              height: "10vh",
+                              scrollbarWidth: "none",
+                            }}
+                          >
+                            {doc.Desc}
+                          </Card.Text>
+                        </Card.Body>
+                      </Card>
                     );
                   }
                 })}
-              </Stack>
+              </div>
             </Row>
           </Col>
         </Row>
