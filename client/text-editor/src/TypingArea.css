@@ -1,0 +1,41 @@
+.edit-button {
+  background-color: #242424;
+  color: white;
+  border-radius: 20;
+  width: fit-content;
+  height: fit-content;
+  align-items: start;
+  border: none;
+  margin: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.edit-button:hover {
+  background-color: #646cff;
+}
+
+.textarea {
+  width: 90%;
+  height: 150px;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  outline: none;
+}
+
+.textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+.textarea::placeholder {
+  color: #999;
+}
+
+.textarea:hover,
+.textarea:active {
+  border-color: #999;
+}
