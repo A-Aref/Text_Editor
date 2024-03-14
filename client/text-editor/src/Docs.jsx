@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 import "./Docs.css";
 
-import Navbar from 'react-bootstrap/Navbar';
+import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import Table from "react-bootstrap/Table";
 import Row from "react-bootstrap/Row";
@@ -22,8 +22,9 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
+import LogoutIcon from "@mui/icons-material/Logout";
 
-function Docs() {
+function Docs(props) {
   const [docs, setDocs] = useState([
     { Title: "sales.txt", Role: "Owner", Desc: "ay7aga" },
     { Title: "sales3.txt", Role: "Editor", Desc: "ay7aga" },
@@ -40,11 +41,27 @@ function Docs() {
     { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga" },
   ]);
 
-  const [users, setUsers] = useState(["Saah", "Salah", "semo","Saah", "Salah", "semo","Saah", "Salah", "semo"]);
+  const [users, setUsers] = useState([
+    "Saah",
+    "Salah",
+    "semo",
+    "Saah",
+    "Salah",
+    "semo",
+    "Saah",
+    "Salah",
+    "semo",
+  ]);
 
-  const renderTooltip = (props) => (
+  const renderTooltipCreate = (props) => (
     <Tooltip id="button-tooltip" {...props} data-bs-theme="dark">
       Create new document
+    </Tooltip>
+  );
+
+  const renderTooltiplogOut = (props) => (
+    <Tooltip id="button-tooltip" {...props} data-bs-theme="dark">
+      LogOut
     </Tooltip>
   );
   const [showCreate, setShowCreate] = useState(false);
@@ -54,8 +71,8 @@ function Docs() {
   const [selected, setSelected] = useState({});
 
   const CreateDocument = () => {
-    const [name,setName] = useState("")
-    const [desc,setDesc] = useState("")
+    const [name, setName] = useState("");
+    const [desc, setDesc] = useState("");
     return (
       <Modal
         aria-labelledby="contained-modal-title-vcenter"
@@ -77,7 +94,9 @@ function Docs() {
             id="name"
             type="text"
             value={name}
-            onChange={(e) => {setName(e.target.value)}}
+            onChange={(e) => {
+              setName(e.target.value);
+            }}
             autoFocus
             placeholder="Doc_1"
           />
@@ -87,7 +106,9 @@ function Docs() {
             as="textarea"
             rows={2}
             value={desc}
-            onChange={(e) => {setDesc(e.target.value)}}
+            onChange={(e) => {
+              setDesc(e.target.value);
+            }}
           />
         </Modal.Body>
         <Modal.Footer>
@@ -101,7 +122,7 @@ function Docs() {
   };
 
   const RenameDocument = () => {
-    const [rename,setRename] = useState("")
+    const [rename, setRename] = useState("");
     return (
       <Modal
         aria-labelledby="contained-modal-title-vcenter"
@@ -123,7 +144,9 @@ function Docs() {
             id="name"
             type="text"
             value={rename}
-            onChange={(e) => {setRename(e.target.value)}}
+            onChange={(e) => {
+              setRename(e.target.value);
+            }}
             autoFocus
             placeholder="Doc_1"
           />
@@ -183,21 +206,36 @@ function Docs() {
             Share Document
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{overflowY:"auto", scrollbarWidth:"none",height:"20rem"}}>
-          <Table striped style={{textAlign:"center"}}>
+        <Modal.Body
+          style={{ overflowY: "auto", scrollbarWidth: "none", height: "20rem" }}
+        >
+          <Table striped style={{ textAlign: "center" }}>
             <thead>
               <tr>
-                <th><h1><i>Name</i></h1></th>
-                <th><h1><i>Role</i></h1></th>
+                <th>
+                  <h1>
+                    <i>Name</i>
+                  </h1>
+                </th>
+                <th>
+                  <h1>
+                    <i>Role</i>
+                  </h1>
+                </th>
               </tr>
             </thead>
             <tbody>
               {users.map((user, key) => {
                 return (
                   <tr key={key}>
-                    <td><h3>{user}</h3></td>
-                    <td style={{justifyContent:"center"}}>
-                      <Form.Select aria-label="Default select example" style={{width:"8rem", margin:"auto"}}>
+                    <td>
+                      <h3>{user}</h3>
+                    </td>
+                    <td style={{ justifyContent: "center" }}>
+                      <Form.Select
+                        aria-label="Default select example"
+                        style={{ width: "8rem", margin: "auto" }}
+                      >
                         <option value="none">None</option>
                         <option value="viewer">Viewer</option>
                         <option value="editor">Editor</option>
@@ -273,23 +311,45 @@ function Docs() {
     );
   };
 
+  const LogOut = () => {
+    props.saveLocal("Login");
+  };
+
   return (
     <div className="md mt-3">
-      <Navbar style={{justifyContent:"right"}} fixed="top">
-        <Button variant="outline-danger" className="me-4 mt-3" size="lg">Logout</Button>
-      </Navbar>
+      <OverlayTrigger
+        placement="bottom"
+        delay={{ show: 250, hide: 400 }}
+        overlay={renderTooltiplogOut}
+      >
+        <Button
+          variant="danger"
+          className="me-4 mt-4 rounded-pill"
+          size="md"
+          style={{ position: "fixed", right: 0 }}
+          onClick={LogOut}
+        >
+          <LogoutIcon />
+        </Button>
+      </OverlayTrigger>
       <Container data-bs-theme="dark" className="md">
         <Row>
           <Col>
             <Row>
-              <div style={{ display: "flex", justifyContent: "space-between", textAlign:"center"}}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  textAlign: "center",
+                }}
+              >
                 <h1 className="display-3">
                   <b>Your Documents </b>
                 </h1>
                 <OverlayTrigger
                   placement="bottom"
                   delay={{ show: 250, hide: 400 }}
-                  overlay={renderTooltip}
+                  overlay={renderTooltipCreate}
                 >
                   <Button
                     className="rounded-pill r"
@@ -337,7 +397,7 @@ function Docs() {
           </Col>
           <Col>
             <Row>
-              <h1 className="display-3" style={{textAlign:"center"}}>
+              <h1 className="display-3" style={{ textAlign: "center" }}>
                 <b>Shared Documents</b>
               </h1>
             </Row>

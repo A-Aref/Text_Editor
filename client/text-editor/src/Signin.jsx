@@ -18,7 +18,9 @@ function Signin(props) {
   const [id, setId] = useState("");
   const [errorText, setErrorText] = useState("  ");
 
-  useEffect(() => props.view("none"), []);
+  useEffect(() => {
+      props.saveLocal('Login')
+  })
 
   function Submit() {
     if (id === "" || password === "") {
@@ -28,7 +30,11 @@ function Signin(props) {
       if (password === "") {
         setErrorText("Enter the password");
       }
-    } else {
+    } else 
+    {
+      // Check in database if user exist
+      props.saveLocal('Docs')
+      navigate('/Docs')
     }
   }
 
