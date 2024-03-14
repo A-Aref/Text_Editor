@@ -33,6 +33,7 @@ return(
             </Routes>
         </Router>
     </>
-)}
+  );
+}
 
-export default Routing
+export default Routing;
