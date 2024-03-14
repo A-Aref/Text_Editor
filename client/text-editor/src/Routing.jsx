@@ -7,7 +7,8 @@ import Docs from './Docs.jsx'
 import Signin from './Signin.jsx'
 import Register from './Register.jsx'
 import EntryPoint from './EntryPoint.jsx';
-import PrivateRoute from './PrivateRoute.jsx'
+import TypingArea from './TypingArea.jsx'
+import PrivateRoute from './PrivateRoute.jsx';
 import './index.css'
 
 function Routing() {
@@ -25,6 +26,7 @@ return(
         <Router>
             <Routes>
                 <Route path='/' element={<EntryPoint saveLocal={saveLocal} setUser={setUser}/>}/>
+                <Route path='/type' element={<TypingArea/>}/>
                 <Route path='/Login' element={<Signin saveLocal={saveLocal} setUser={setUser}/>}/>
                 <Route path='/Register' element={<Register/>}/>
                 <Route element={<PrivateRoute viewSet="Docs"  view={page}/>}>

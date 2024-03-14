@@ -1,18 +1,11 @@
 .edit-button {
   background-color: #242424;
   color: white;
-  border-radius: 20;
-  width: fit-content;
-  height: fit-content;
-  align-items: start;
-  border: none;
-  margin: 0;
-  cursor: pointer;
-  padding: 0;
 }
 
 .edit-button:hover {
   background-color: #646cff;
+  color: white;
 }
 
 .textarea {
