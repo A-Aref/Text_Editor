@@ -27,6 +27,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 
 
 function Docs(props) {
+  const navigate = useNavigate();
   const [docs, setDocs] = useState([
     { Title: "sales.txt", Role: "Owner", Desc: "ay7aga" },
     { Title: "sales3.txt", Role: "Editor", Desc: "ay7aga" },
@@ -34,13 +35,9 @@ function Docs(props) {
     { Title: "sales4.txt", Role: "Viewer", Desc: "ay7aga" },
     { Title: "sales4.txt", Role: "Editor", Desc: "ay7aga" },
     { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga" },
-    { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga" },
-    { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga" },
     { Title: "sales4.txt", Role: "Editor", Desc: "ay7aga" },
     { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga" },
     { Title: "sales4.txt", Role: "Viewer", Desc: "ay7aga" },
-    { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga" },
-    { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga" },
   ]);
 
   const [users, setUsers] = useState([
@@ -75,6 +72,11 @@ function Docs(props) {
   const CreateDocument = () => {
     const [name, setName] = useState("");
     const [desc, setDesc] = useState("");
+
+    function addDocument() {
+      const document = { Title: name, Role: "Owner", Desc: desc }
+      setDocs([...docs,document])
+    }
     return (
       <Modal
         aria-labelledby="contained-modal-title-vcenter"
@@ -100,7 +102,7 @@ function Docs(props) {
               setName(e.target.value);
             }}
             autoFocus
-            placeholder="Doc_1"
+            placeholder="Doc1"
           />
           <Form.Label htmlFor="desc">Description</Form.Label>
           <Form.Control
@@ -117,7 +119,7 @@ function Docs(props) {
           <Button variant="danger" onClick={() => setShowCreate(false)}>
             Cancel
           </Button>
-          <Button variant="primary">Create</Button>
+          <Button variant="primary" onClick={() => {addDocument();setShowCreate(false);}}>Create</Button>
         </Modal.Footer>
       </Modal>
     );
@@ -317,6 +319,11 @@ function Docs(props) {
     props.saveLocal("Login");
   };
 
+  const openEditor = (doc) => {
+    props.saveLocal(`Docs/${doc.Title}`)
+    props.setEdit(doc.Role === "Viewer" ? true:false)
+  }
+
   return (
     <div className="md mt-3">
       <OverlayTrigger
@@ -383,12 +390,14 @@ function Docs(props) {
                           <Card.Text
                             style={{
                               overflowY: "auto",
-                              height: "10vh",
                               scrollbarWidth: "none",
                             }}
                           >
                             {doc.Desc}
                           </Card.Text>
+                          <div style={{justifyContent:"right",display:"flex"}}>
+                          <Button variant="outline-secondary" onClick={() => openEditor(doc)}>Open</Button>
+                          </div>
                         </Card.Body>
                       </Card>
                     );
@@ -430,12 +439,14 @@ function Docs(props) {
                           <Card.Text
                             style={{
                               overflowY: "auto",
-                              height: "10vh",
                               scrollbarWidth: "none",
                             }}
                           >
                             {doc.Desc}
                           </Card.Text>
+                          <div style={{justifyContent:"right",display:"flex"}}>
+                          <Button variant="outline-secondary" onClick={() => openEditor(doc)}>Open</Button>
+                          </div>
                         </Card.Body>
                       </Card>
                     );

@@ -13,10 +13,11 @@
     width: 18rem;
     margin: 10px;
     height: 20vh;
+    max-height: 25vh;
 }
 
 .document:hover {
   background-color: #274c61;
   box-shadow: 0 0 10px whitesmoke;
-  transform: scale(1.05);
+  transform: scale(1.07);
 }

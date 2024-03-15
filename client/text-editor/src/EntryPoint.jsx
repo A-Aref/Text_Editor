@@ -14,7 +14,6 @@ function EntryPoint(props) {
         {
             props.saveLocal(Page)
             navigate(Page)
-            console.log("Enter")
         }
         else
         {

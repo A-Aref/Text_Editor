@@ -1,5 +1,5 @@
 import "./Register.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 
@@ -14,8 +14,7 @@ import IconButton from "@mui/material/IconButton";
 function Register(props) {
   const navigate = useNavigate();
   const [errorText, setErrorText] = useState("");
-  const [fname, setfname] = useState("");
-  const [lname, setlname] = useState("");
+  const [name, setName] = useState("");
   const [phone, setphone] = useState("");
   const [dOB, setDOB] = useState("");
   const [pass, setpass] = useState("");
@@ -27,20 +26,16 @@ function Register(props) {
     setaddress("");
     setpass("");
     setemail("");
-    setfname("");
-    setlname("");
+    setName("");
     setphone("");
     setPopulated(false);
   }
 
   function Registerbutt() {
     setPopulated(true);
-    if (!/^[a-zA-Z]+$/.test(fname.trim())) {
+    if (!/^[a-zA-Z]+$/.test(name.trim())) {
       setPopulated(false);
       alert("Please enter First name.");
-    } else if (!/^[a-zA-Z]+$/.test(lname.trim())) {
-      setPopulated(false);
-      alert("Please enter Last name.");
     } else if (!email.trim()) {
       setPopulated(false);
       alert("Email is missing");
@@ -63,22 +58,13 @@ function Register(props) {
         <h1>Register</h1>
         <br />
         <div id="register_fields">
-          <Form.Label htmlFor="fname">First Name</Form.Label>
+          <Form.Label htmlFor="name">Name</Form.Label>
           <Form.Control
-            id="fname"
+            id="name"
             type="text"
-            value={fname}
+            value={name}
             onChange={(e) => {
-              setfname(e.target.value);
-            }}
-          />
-          <Form.Label htmlFor="lname">Last Name</Form.Label>
-          <Form.Control
-            id="lname"
-            type="text"
-            value={lname}
-            onChange={(e) => {
-              setlname(e.target.value);
+              setName(e.target.value);
             }}
           />
           <Form.Label htmlFor="phone">Phone</Form.Label>
@@ -138,6 +124,7 @@ function Register(props) {
           <button id="reg" onClick={Registerbutt}>
             Register
           </button>
+          <p>Already have an account? <Link to="/Login">Sign in</Link></p>
         </div>
       </fieldset>
     </div>

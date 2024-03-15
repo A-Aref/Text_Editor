@@ -1,4 +1,5 @@
 import React from "react";
+import { useParams,useNavigate } from "react-router-dom";
 
 import Navbar from "react-bootstrap/Navbar";
 
@@ -9,13 +10,16 @@ import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import "./TypingArea.css";
 
-function TypingArea({/* text */}) {
+function TypingArea(props) {
+  const params = useParams()
+  const navigate = useNavigate()
   // const TypingBox = () => {
   //   const [text, setText] = useState("");
   // };
   const handleBack = () => {
     // Handle the save functionality
-    console.log("Bold clicked");
+    props.saveLocal('Docs')
+    navigate('/Docs')
   };
   const handleBold = () => {
     // Handle the save functionality
@@ -47,7 +51,7 @@ function TypingArea({/* text */}) {
           <SaveIcon fontSize="large"/>
         </button>
         </div>
-        <div></div>
+        <h2 style={{marginRight:"3rem"}}><i>{params.id}</i></h2>
       </Navbar>
       <br />
       <div style={{justifyContent:"center",display:"flex"}}>
@@ -56,6 +60,7 @@ function TypingArea({/* text */}) {
         // value={text}
         // onChange={handleChange}
         placeholder="Start typing..."
+        disabled = {props.edit}
       />
       </div>
     </div>
