@@ -12,28 +12,28 @@ import './index.css'
 
 function Routing() {
 
-    const [page,setPage] = useState()
+    const [page,setPage] = useState('Login')
     const [edit,setEdit] = useState()
     const [user,setUser] = useState({})
 
-    const saveLocal = (S) =>{
-        setPage(S)
-        localStorage.setItem('page', S);
-    }
+
+    const setToDocs  = (() => setPage('Docs'))
+
     
 return(
     <>
         <Router>
             <Routes>
-                <Route path='/' element={<EntryPoint saveLocal={saveLocal} setUser={setUser}/>}/>
-                
-                <Route path='/Login' element={<Signin saveLocal={saveLocal} setUser={setUser}/>}/>
+                <Route path='/' element={<EntryPoint setPage ={setToDocs}/>}/>
+                <Route path='/Login' element={<Signin setPage={setPage} setUser={setUser}/>}/>
                 <Route path='/Register' element={<Register/>}/>
                 <Route element={<PrivateRoute viewSet="Docs"  view={page}/>}>
-                    <Route path='/Docs' element={<Docs saveLocal={saveLocal} setEdit={setEdit}/> }/> 
+                    <Route path='/Docs' element={<Docs setPage={setPage} setEdit={setEdit}/> }/> 
                 </Route>
-                <Route path='/Docs/:id' element={<TypingArea saveLocal={saveLocal} edit={edit}/>}/>
-                <Route path='*' element={<EntryPoint saveLocal={saveLocal} setUser={setUser}/>}/>
+                <Route element={<PrivateRoute viewSet="Editor"  view={page}/>}>
+                    <Route path='/Docs/:id' element={<TypingArea setPage={setPage} edit={edit}/>}/>
+                </Route>
+                <Route path='*' element={<EntryPoint setPage={setPage} setUser={setUser}/>}/>
             </Routes>
         </Router>
     </>

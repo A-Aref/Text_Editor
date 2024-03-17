@@ -18,7 +18,6 @@ function TypingArea(props) {
   // };
   const handleBack = () => {
     // Handle the save functionality
-    props.saveLocal('Docs')
     navigate('/Docs')
   };
   const handleBold = () => {
@@ -40,6 +39,7 @@ function TypingArea(props) {
         <IconButton style={{ color: "white"}} onClick={handleBack}>
          <ArrowBackIcon fontSize="large"/>
         </IconButton>
+        {!props.edit ? 
         <div className="rounded">
         <button className="edit-button" onClick={handleBold}>
          <FormatBoldIcon fontSize="large"/>
@@ -51,6 +51,9 @@ function TypingArea(props) {
           <SaveIcon fontSize="large"/>
         </button>
         </div>
+        :
+        <div></div>
+        }
         <h2 style={{marginRight:"3rem"}}><i>{params.id}</i></h2>
       </Navbar>
       <br />

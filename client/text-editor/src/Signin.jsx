@@ -20,7 +20,7 @@ function Signin(props) {
   const [errorText, setErrorText] = useState("  ");
 
   useEffect(() => {
-      props.saveLocal('Login')
+      props.setPage('Login')
   })
 
   function Submit() {
@@ -34,8 +34,9 @@ function Signin(props) {
     } else 
     {
       // Check in database if user exist
-      props.saveLocal('Docs')
+      props.setPage('Docs')
       navigate('/Docs')
+      localStorage.setItem('page','Docs')
     }
   }
 

@@ -10,6 +10,7 @@ import Form from "react-bootstrap/Form";
 import Card from "react-bootstrap/Card";
 import Modal from "react-bootstrap/Modal";
 import Table from "react-bootstrap/Table";
+import Navbar from "react-bootstrap/Navbar";
 import Button from "react-bootstrap/Button";
 import Tooltip from "react-bootstrap/Tooltip";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -316,16 +317,19 @@ function Docs(props) {
   };
 
   const LogOut = () => {
-    props.saveLocal("Login");
+    props.setPage('Login')
+    localStorage.setItem('page','Login')
   };
 
   const openEditor = (doc) => {
-    props.saveLocal(`Docs/${doc.Title}`)
+    props.setPage('Editor')
+    navigate(`/Docs/${doc.Title}`)
     props.setEdit(doc.Role === "Viewer" ? true:false)
   }
 
   return (
     <div className="md mt-3">
+      <Navbar className="mb-4">
       <OverlayTrigger
         placement="bottom"
         delay={{ show: 250, hide: 400 }}
@@ -335,14 +339,15 @@ function Docs(props) {
           variant="danger"
           className="me-4 mt-4 rounded-pill"
           size="md"
-          style={{ position: "fixed", right: 0 }}
+          style={{ position: "absolute", right: 0 }}
           onClick={LogOut}
         >
           <LogoutIcon />
         </Button>
       </OverlayTrigger>
+      </Navbar>
       <Container data-bs-theme="dark" className="md">
-        <Row>
+        <Row >
           <Col>
             <Row>
               <div
@@ -350,6 +355,7 @@ function Docs(props) {
                   display: "flex",
                   justifyContent: "space-between",
                   textAlign: "center",
+                  alignItems: "center"
                 }}
               >
                 <h1 className="display-3">
@@ -361,10 +367,10 @@ function Docs(props) {
                   overlay={renderTooltipCreate}
                 >
                   <Button
-                    className="rounded-pill r"
+                    className="rounded-circle"
                     onClick={() => setShowCreate(true)}
                   >
-                    <AddIcon sx={{ fontSize: 50 }} />
+                    <AddIcon sx={{ fontSize: 45 }} />
                   </Button>
                 </OverlayTrigger>
               </div>

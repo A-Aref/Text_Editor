@@ -7,23 +7,20 @@ import { useEffect, useState } from 'react'
 function EntryPoint(props) {
 
     const navigate = useNavigate();
-
+    const page =localStorage.getItem('page')
     useEffect(()=>{
-        const Page = localStorage.getItem('page')
-        if(Page !== undefined)
+        
+        if(page === 'Docs')
         {
-            props.saveLocal(Page)
-            navigate(Page)
+            props.setPage('page')
+            navigate('Docs')
         }
         else
         {
-            props.saveLocal('Login')
-            navigate('/Login')
-        }
+            navigate('Login')
+        }  
     },[])
 
-
-    
 return(
     <>
     </>
