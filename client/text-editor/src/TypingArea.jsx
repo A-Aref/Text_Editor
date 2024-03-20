@@ -10,6 +10,7 @@ import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import "./TypingArea.css";
 
+
 function TypingArea(props) {
   const params = useParams()
   const navigate = useNavigate()
