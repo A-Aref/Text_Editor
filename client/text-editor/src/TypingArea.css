@@ -1,53 +1,42 @@
 .edit-button {
   background-color: #242424;
-  color: white;
-  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-  font-size:large;
-  justify-content:space-between;
-  width: max-content;
-   display: flex;
-    
-}
-.edit-button .saveIcon{
-  margin-right: 12px;
+  color: #3d3a3a;
+  padding: 0;
+  height: 50px;
+  width: 50px;
 }
 .edit-button:hover {
-  background-color: #646cff;
-  color: white;
+  background-color: #aee1cd;
+  color: rgb(0, 89, 255);
 }
 
 #my-quill-toolbar {
-  width: 90%;
-  height:90svh;
-}
-
-#my-quill-toolbar .ql-toolbar {
-  background-color: #000000;
-  border-bottom: 2px solid #ccc;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  border: none;
   align-items: center;
 }
-#my-quill-toolbar .ql-editor {
-  background-color: #ffffff;
-  color: #000000;
-  font-size: medium;
-  margin-bottom: 10px;
-}
- 
-#my-quill-toolbar .ql-toolbar  .ql-bold ,#my-quill-toolbar .ql-toolbar  .ql-italic {
-  width: 40px; 
-  height: 40px;  
- color: #ffffff;
- 
+
+#my-quill-toolbar .ql-bold,
+#my-quill-toolbar .ql-italic {
+  width: 50px;
+  height: 50px;
+  margin: 0;
+  margin-left: 10px;
+  margin-right: 10px;
+  background-color: #242424;
 }
 
-#my-quill-toolbar .ql-editor:focus {
-  border-color: #022c56;
-  border-radius: 2px;
-  box-shadow: 0 0 0 2px  #646cff;
+#my-quill-toolbar .ql-bold:hover,
+#my-quill-toolbar .ql-italic:hover {
+  background-color: #aee1cd;
 }
 
- 
 
- 
+.ql-editor,.ql-container,#editor{
+  background-color: #1a1a1a;
+  margin-left: 10px;
+  margin-right: 10px;
+  height: 80vh;
+  border-radius: 10px;
+  font-size: 18px;
+  font-family: "Courier New", monospace;
+}
