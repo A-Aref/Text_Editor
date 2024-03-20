@@ -1,34 +1,53 @@
 .edit-button {
   background-color: #242424;
   color: white;
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size:large;
+  justify-content:space-between;
+  width: max-content;
+   display: flex;
+    
 }
-
+.edit-button .saveIcon{
+  margin-right: 12px;
+}
 .edit-button:hover {
   background-color: #646cff;
   color: white;
 }
 
-.textarea {
+#my-quill-toolbar {
   width: 90%;
-  height: 150px;
-  padding: 12px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  resize: vertical;
-  outline: none;
+  height:90svh;
 }
 
-.textarea:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+#my-quill-toolbar .ql-toolbar {
+  background-color: #000000;
+  border-bottom: 2px solid #ccc;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+#my-quill-toolbar .ql-editor {
+  background-color: #ffffff;
+  color: #000000;
+  font-size: medium;
+  margin-bottom: 10px;
+}
+ 
+#my-quill-toolbar .ql-toolbar  .ql-bold ,#my-quill-toolbar .ql-toolbar  .ql-italic {
+  width: 40px; 
+  height: 40px;  
+ color: #ffffff;
+ 
 }
 
-.textarea::placeholder {
-  color: #999;
+#my-quill-toolbar .ql-editor:focus {
+  border-color: #022c56;
+  border-radius: 2px;
+  box-shadow: 0 0 0 2px  #646cff;
 }
 
-.textarea:hover,
-.textarea:active {
-  border-color: #999;
-}
+ 
+
+ 
