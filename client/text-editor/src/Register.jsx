@@ -15,19 +15,15 @@ function Register(props) {
   const navigate = useNavigate();
   const [errorText, setErrorText] = useState("");
   const [name, setName] = useState("");
-  const [phone, setphone] = useState("");
-  const [dOB, setDOB] = useState("");
+  const [email, setemail] = useState("");
   const [pass, setpass] = useState("");
   const [showPassword, setShowPassword] = useState(true);
-  const [email, setemail] = useState("");
   const [populated, setPopulated] = useState(false);
 
   function reset() {
-    setaddress("");
     setpass("");
     setemail("");
     setName("");
-    setphone("");
     setPopulated(false);
   }
 
@@ -39,15 +35,9 @@ function Register(props) {
     } else if (!email.trim()) {
       setPopulated(false);
       alert("Email is missing");
-    } else if (!address.trim()) {
-      setPopulated(false);
-      alert("Address is missing");
     } else if (!pass.trim()) {
       setPopulated(false);
       alert("password is missing");
-    } else if (!/^[0-9]+$/.test(phone.trim())) {
-      setPopulated(false);
-      alert("Please enter a valid phone num.");
     }
   }
 
@@ -67,15 +57,6 @@ function Register(props) {
               setName(e.target.value);
             }}
           />
-          <Form.Label htmlFor="phone">Phone</Form.Label>
-          <Form.Control
-            id="phone"
-            type="text"
-            value={phone}
-            onChange={(e) => {
-              setphone(e.target.value);
-            }}
-          />
           <Form.Label htmlFor="email">Email</Form.Label>
           <Form.Control
             id="email"
@@ -83,15 +64,6 @@ function Register(props) {
             value={email}
             onChange={(e) => {
               setemail(e.target.value);
-            }}
-          />
-          <Form.Label htmlFor="DOB">Date of Birth</Form.Label>
-          <Form.Control
-            id="DOB"
-            type="date"
-            value={dOB}
-            onChange={(e) => {
-              setDOB(e.target.value);
             }}
           />
           <Form.Label htmlFor="Pass">Password</Form.Label>
