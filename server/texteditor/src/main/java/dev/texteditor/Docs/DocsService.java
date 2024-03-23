@@ -1,9 +1,9 @@
-package dev.texteditor;
+package dev.texteditor.Docs;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.bson.types.ObjectId;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +13,15 @@ public class DocsService {
     @Autowired
     private DocsRepository docsRepository;
 
-    public Optional<Docs> getDoc(ObjectId id){
+    public Optional<Docs> getDoc(String id){
         if(id == null)
             return null;
-        return docsRepository.findById(id);
+        return docsRepository.findByDocId(id);
     }
 
     public List<Docs> getAllDoc(){
         return docsRepository.findAll();
     }
+
 
 }

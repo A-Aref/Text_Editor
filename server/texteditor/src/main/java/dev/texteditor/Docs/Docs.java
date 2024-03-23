@@ -1,4 +1,4 @@
-package dev.texteditor;
+package dev.texteditor.Docs;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -17,6 +17,7 @@ public class Docs {
     @Id
     private ObjectId id;
 
+    private String docId;
     private String desc;
     private String data;
     private String lastSave;

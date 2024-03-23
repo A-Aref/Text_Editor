@@ -1,4 +1,4 @@
-package dev.texteditor;
+package dev.texteditor.UserDoc;
 
 
 import org.bson.types.ObjectId;
@@ -21,8 +21,8 @@ public class UserDoc {
 
     private String role;
     @DocumentReference
-    private String doc;
+    private String docId;
     @DocumentReference
-    private String user;
+    private String userId;
 }
 

@@ -1,4 +1,4 @@
-package dev.texteditor;
+package dev.texteditor.Users;
 
 
 import org.bson.types.ObjectId;
@@ -18,6 +18,7 @@ public class Users {
     @Id
     private ObjectId id;
 
+    private String userId;
     private String name;
     private String password;
     private String email;
