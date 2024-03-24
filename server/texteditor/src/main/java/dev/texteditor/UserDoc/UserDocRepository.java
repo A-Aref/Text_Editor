@@ -15,5 +15,4 @@ public interface UserDocRepository extends MongoRepository<UserDoc,ObjectId> {
     
 List<UserDoc> findByUserId(String userId);
 List<UserDoc> findByDocId(String docId);
-UserDocRepository findByDocIdRepo(String docId);
 }

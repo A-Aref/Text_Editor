@@ -30,15 +30,15 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 function Docs(props) {
   const navigate = useNavigate();
   const [docs, setDocs] = useState([
-    { Title: "sales.txt", Role: "Owner", Desc: "ay7aga" },
-    { Title: "sales3.txt", Role: "Editor", Desc: "ay7aga" },
-    { Title: "sales1.txt", Role: "Owner", Desc: "ay7aga" },
-    { Title: "sales4.txt", Role: "Viewer", Desc: "ay7aga" },
-    { Title: "sales4.txt", Role: "Editor", Desc: "ay7aga" },
-    { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga" },
-    { Title: "sales4.txt", Role: "Editor", Desc: "ay7aga" },
-    { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga" },
-    { Title: "sales4.txt", Role: "Viewer", Desc: "ay7aga" },
+    { Title: "sale", Role: "Owner", Desc: "ay7aga",docId:"htu59"},
+    { Title: "sales3.txt", Role: "Editor", Desc: "ay7aga",docId:"htu9" },
+    { Title: "sales1.txt", Role: "Owner", Desc: "ay7aga",docId:"htu9" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "ay7aga",docId:"htu9" },
+    { Title: "sales4.txt", Role: "Editor", Desc: "ay7aga",docId:"htu9" },
+    { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga",docId:"htu9" },
+    { Title: "sales4.txt", Role: "Editor", Desc: "ay7aga",docId:"htu9" },
+    { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga",docId:"htu9" },
+    { Title: "sales4.txt", Role: "Viewer", Desc: "ay7aga",docId:"htu9" },
   ]);
 
   const [users, setUsers] = useState([
@@ -323,7 +323,7 @@ function Docs(props) {
 
   const openEditor = (doc) => {
     props.setPage('Editor')
-    navigate(`/Docs/${doc.Title}`)
+    navigate(`/Docs/${doc.docId}`)
     props.setEdit(doc.Role === "Viewer" ? true:false)
   }
 

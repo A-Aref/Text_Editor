@@ -19,7 +19,7 @@ public class Docs {
 
     private String docId;
     private String desc;
-    private String data;
+    private Object data;
     private String lastSave;
-    private String name;
+    private String Title;
 }

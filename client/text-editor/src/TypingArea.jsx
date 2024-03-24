@@ -7,24 +7,68 @@ import SaveIcon from "@mui/icons-material/Save";
 import IconButton from "@mui/material/IconButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-import ReactQuill,{ Quill } from "react-quill";
+import ReactQuill, { Quill } from "react-quill";
+
+import { Client } from "@stomp/stompjs";
 
 import "./TypingArea.css";
 import "quill/dist/quill.snow.css";
 
 function TypingArea(props) {
-
   const params = useParams();
   const navigate = useNavigate();
-  const ref  = useRef()
+  const ref = useRef();
 
   const [value, setValue] = useState("");
-  const [value1, setValue1] = useState("");
+  const [title, setTitle] = useState("");
 
-  useEffect(()=>{
-    if(value)
-      console.log(ref.current.getEditor().getContents())
-  },[value])
+  const client = new Client({
+    brokerURL: "ws://localhost:8080/api",
+    onConnect: () => {
+      client.subscribe(`/topic/public/${params.id}`, (message) => {
+        console.log(`Received: ${message.body}`);
+        setValue(JSON.parse(message.body))
+      });
+    },
+  });
+
+
+  const sendData = () => {
+    if(client.connected) {
+      client.publish({
+        destination: `/app/${params.id}/chat.sendData`,
+        body: JSON.stringify(ref.current.getEditor().getContents()),
+      });
+    }
+    else
+    {
+      client.activate()
+    }
+  };
+
+  useEffect(() => {
+    fetch(" /api/v1/docs/data", {
+      method: "POST",
+      body: JSON.stringify({ docId: params.id }),
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setValue(data.data);
+        setTitle(data.title);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (value) {
+      console.log(ref.current.getEditor().getContents());
+    }
+  }, [value]);
 
   const handleBack = () => {
     // Handle the save functionality
@@ -33,6 +77,7 @@ function TypingArea(props) {
   const handleSave = () => {
     // Handle the save functionality
     console.log("Save clicked");
+    sendData()
   };
 
   return (
@@ -59,15 +104,15 @@ function TypingArea(props) {
           <div id="my-quill-toolbar"></div>
         )}
         <h2 style={{ marginRight: "3rem" }}>
-          <i>{params.id}</i>
+          <i>{title}</i>
         </h2>
       </Navbar>
       <br />
       <ReactQuill
-        ref = {ref}
+        ref={ref}
         theme="snow"
         value={value}
-        onChange={setValue}
+        onChange={sendData}
         modules={{ toolbar: { container: "#my-quill-toolbar" } }}
         readOnly={props.edit}
         id="editor"

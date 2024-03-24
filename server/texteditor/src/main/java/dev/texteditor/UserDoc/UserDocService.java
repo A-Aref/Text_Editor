@@ -20,9 +20,4 @@ public class UserDocService {
         return userDocRepository.findByDocId(docId);
     }
 
-    public List<UserDoc> getUserDoc(String userId,String docId){
-        return userDocRepository.findByDocIdRepo(docId).findByUserId(userId);
-    }
-
-
 }

@@ -1,6 +1,7 @@
 {
   "name": "text-editor",
   "private": true,
+  "proxy": "http://localhost:8080/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -14,17 +15,25 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.11",
     "@mui/material": "^5.15.11",
+    "@stomp/stompjs": "^7.0.0",
     "bootstrap": "^5.3.3",
+    "net": "^1.0.2",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",
     "react-dom": "^18.2.0",
     "react-quill": "^2.0.0",
     "react-quilljs": "^1.3.3",
-    "react-router-dom": "^6.22.2"
+    "react-router-dom": "^6.22.2",
+    "react-stomp": "^5.1.0",
+    "sockjs": "^0.3.24",
+    "sockjs-client": "^1.6.1",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
+    "@types/quill": "^2.0.14",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",
+    "@types/sockjs-client": "^1.5.4",
     "@vitejs/plugin-react": "^4.2.1",
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.33.2",
