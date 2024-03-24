@@ -1,5 +1,5 @@
 import "./Register.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 
@@ -14,45 +14,30 @@ import IconButton from "@mui/material/IconButton";
 function Register(props) {
   const navigate = useNavigate();
   const [errorText, setErrorText] = useState("");
-  const [fname, setfname] = useState("");
-  const [lname, setlname] = useState("");
-  const [phone, setphone] = useState("");
-  const [dOB, setDOB] = useState("");
+  const [name, setName] = useState("");
+  const [email, setemail] = useState("");
   const [pass, setpass] = useState("");
   const [showPassword, setShowPassword] = useState(true);
-  const [email, setemail] = useState("");
   const [populated, setPopulated] = useState(false);
 
   function reset() {
-    setaddress("");
     setpass("");
     setemail("");
-    setfname("");
-    setlname("");
-    setphone("");
+    setName("");
     setPopulated(false);
   }
 
   function Registerbutt() {
     setPopulated(true);
-    if (!/^[a-zA-Z]+$/.test(fname.trim())) {
+    if (!/^[a-zA-Z]+$/.test(name.trim())) {
       setPopulated(false);
       alert("Please enter First name.");
-    } else if (!/^[a-zA-Z]+$/.test(lname.trim())) {
-      setPopulated(false);
-      alert("Please enter Last name.");
     } else if (!email.trim()) {
       setPopulated(false);
       alert("Email is missing");
-    } else if (!address.trim()) {
-      setPopulated(false);
-      alert("Address is missing");
     } else if (!pass.trim()) {
       setPopulated(false);
       alert("password is missing");
-    } else if (!/^[0-9]+$/.test(phone.trim())) {
-      setPopulated(false);
-      alert("Please enter a valid phone num.");
     }
   }
 
@@ -63,31 +48,13 @@ function Register(props) {
         <h1>Register</h1>
         <br />
         <div id="register_fields">
-          <Form.Label htmlFor="fname">First Name</Form.Label>
+          <Form.Label htmlFor="name">Name</Form.Label>
           <Form.Control
-            id="fname"
+            id="name"
             type="text"
-            value={fname}
+            value={name}
             onChange={(e) => {
-              setfname(e.target.value);
-            }}
-          />
-          <Form.Label htmlFor="lname">Last Name</Form.Label>
-          <Form.Control
-            id="lname"
-            type="text"
-            value={lname}
-            onChange={(e) => {
-              setlname(e.target.value);
-            }}
-          />
-          <Form.Label htmlFor="phone">Phone</Form.Label>
-          <Form.Control
-            id="phone"
-            type="text"
-            value={phone}
-            onChange={(e) => {
-              setphone(e.target.value);
+              setName(e.target.value);
             }}
           />
           <Form.Label htmlFor="email">Email</Form.Label>
@@ -97,15 +64,6 @@ function Register(props) {
             value={email}
             onChange={(e) => {
               setemail(e.target.value);
-            }}
-          />
-          <Form.Label htmlFor="DOB">Date of Birth</Form.Label>
-          <Form.Control
-            id="DOB"
-            type="date"
-            value={dOB}
-            onChange={(e) => {
-              setDOB(e.target.value);
             }}
           />
           <Form.Label htmlFor="Pass">Password</Form.Label>
@@ -138,6 +96,7 @@ function Register(props) {
           <button id="reg" onClick={Registerbutt}>
             Register
           </button>
+          <p>Already have an account? <Link to="/Login">Sign in</Link></p>
         </div>
       </fieldset>
     </div>

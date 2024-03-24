@@ -1,19 +1,29 @@
 
 
-.documents{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.2);
-    padding: 5px;
-    border-radius: 20px;
-    transition: 0.15s;
-      
+.documents {
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  scrollbar-width: none;
+  height: 80vh;
+  margin-top: 1rem;
 }
 
+@media screen and (max-width: 1400px) {
+  .documents {
+    justify-content: center;
+  }
+}
 
-.documents:hover{
-    background-color: #2E4755;
-    box-shadow: 0 0 10px whitesmoke;
-    transform:scale(1.05);
+.document{
+    width: 18rem;
+    margin: 10px;
+    height: 20vh;
+    max-height: 25vh;
+}
+
+.document:hover {
+  background-color: #274c61;
+  box-shadow: 0 0 10px whitesmoke;
+  transform: scale(1.07);
 }

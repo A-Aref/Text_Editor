@@ -1,0 +1,42 @@
+.edit-button {
+  background-color: #242424;
+  color: #3d3a3a;
+  padding: 0;
+  height: 50px;
+  width: 50px;
+}
+.edit-button:hover {
+  background-color: #aee1cd;
+  color: rgb(0, 89, 255);
+}
+
+#my-quill-toolbar {
+  border: none;
+  align-items: center;
+}
+
+#my-quill-toolbar .ql-bold,
+#my-quill-toolbar .ql-italic {
+  width: 50px;
+  height: 50px;
+  margin: 0;
+  margin-left: 10px;
+  margin-right: 10px;
+  background-color: #242424;
+}
+
+#my-quill-toolbar .ql-bold:hover,
+#my-quill-toolbar .ql-italic:hover {
+  background-color: #aee1cd;
+}
+
+
+.ql-editor,.ql-container,#editor{
+  background-color: #1a1a1a;
+  margin-left: 10px;
+  margin-right: 10px;
+  height: 80vh;
+  border-radius: 10px;
+  font-size: 18px;
+  font-family: "Courier New", monospace;
+}
