@@ -12,4 +12,5 @@ public interface DocsRepository extends MongoRepository<Docs,ObjectId> {
     
     Optional<Docs> findByDocId(String docId);
 
+    void deleteByDocId(String docId);
 }

@@ -49,5 +49,30 @@ public class DocsController {
       
 		  return new ResponseEntity<Object>(d, HttpStatus.OK);
 	  }
+
+    @PostMapping("/rename")
+    public ResponseEntity<Object> RenameDocument(@RequestBody Map<String,Object> payload) {
+      String docId = (String) payload.get("docId");
+      String title = (String) payload.get("Title");
+
+      if(docsService.getDoc(docId).isPresent()) {
+        if (title == "") { return ResponseEntity.badRequest().body("Title cannot be Empty"); }
+        docsService.updateDocumentName(docId, title);
+      }
+      else { return null; }
+      return new ResponseEntity<Object>('1', HttpStatus.OK);
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<Object> DeleteTheDocument(@RequestBody Map<String,Object> payload) {
+      String docId = (String) payload.get("docId");
+
+      if (docsService.getDoc(docId).isPresent()) {
+        docsService.DeleteDocumentById(docId);
+        System.out.println("received: " + docId);
+        return new ResponseEntity<Object>('1', HttpStatus.OK);
+      }
+      return null;
+    }
     
 }
