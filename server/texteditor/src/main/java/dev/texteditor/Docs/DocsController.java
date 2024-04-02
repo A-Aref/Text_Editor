@@ -54,25 +54,26 @@ public class DocsController {
     public ResponseEntity<Object> RenameDocument(@RequestBody Map<String,Object> payload) {
       String docId = (String) payload.get("docId");
       String title = (String) payload.get("Title");
-
-      if(docsService.getDoc(docId).isPresent()) {
-        if (title == "") { return ResponseEntity.badRequest().body("Title cannot be Empty"); }
-        docsService.updateDocumentName(docId, title);
+      System.out.println("hello: " + title);
+      if(!docsService.getDoc(docId).isPresent()) {
+       return ResponseEntity.badRequest().body("Document is not Found");
       }
-      else { return null; }
+      if (title == "") {
+        return ResponseEntity.badRequest().body("Title cannot be Empty");
+      }
+      docsService.updateDocumentName(docId, title);
       return new ResponseEntity<Object>('1', HttpStatus.OK);
     }
 
     @PostMapping("/delete")
     public ResponseEntity<Object> DeleteTheDocument(@RequestBody Map<String,Object> payload) {
       String docId = (String) payload.get("docId");
-
-      if (docsService.getDoc(docId).isPresent()) {
-        docsService.DeleteDocumentById(docId);
-        System.out.println("received: " + docId);
-        return new ResponseEntity<Object>('1', HttpStatus.OK);
+      System.out.println("received: " + docId);
+      if (!docsService.getDoc(docId).isPresent()) {
+        return ResponseEntity.badRequest().body("Document is not Found");
       }
-      return null;
+      docsService.DeleteDocumentById(docId);
+      return new ResponseEntity<Object>('1', HttpStatus.OK);
     }
     
 
