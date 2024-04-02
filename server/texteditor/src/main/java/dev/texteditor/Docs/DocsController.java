@@ -49,5 +49,16 @@ public class DocsController {
       
 		  return new ResponseEntity<Object>(d, HttpStatus.OK);
 	  }
+
+    public Object getDocDataBack(String id) {
+      if(id != null)
+      {
+        return docsService.getDoc(id).get().getData();
+      }
+      else
+      {
+        return null;
+      }
+	  }
     
 }

@@ -21,54 +21,36 @@ function TypingArea(props) {
 
   const [value, setValue] = useState("");
   const [title, setTitle] = useState("");
+  const [client,setStompClient] = useState(null)
 
-  const client = new Client({
-    brokerURL: "ws://localhost:8080/api",
-    onConnect: () => {
-      client.subscribe(`/topic/public/${params.id}`, (message) => {
-        console.log(`Received: ${message.body}`);
-        setValue(JSON.parse(message.body))
-      });
-    },
-  });
+ 
 
 
-  const sendData = () => {
+  const sendData = (content, delta, source, editor) => {
     if(client.connected) {
       client.publish({
         destination: `/app/${params.id}/chat.sendData`,
-        body: JSON.stringify(ref.current.getEditor().getContents()),
+        body: JSON.stringify(editor.getContents()),
       });
-    }
-    else
-    {
-      client.activate()
     }
   };
 
   useEffect(() => {
-    fetch(" /api/v1/docs/data", {
-      method: "POST",
-      body: JSON.stringify({ docId: params.id }),
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+    const client = new Client({
+      brokerURL: "ws://localhost:8080/api",
+      onConnect: () => {
+        client.subscribe(`/app/sub/${params.id}`, (message) => {
+          setValue(JSON.parse(message.body))
+        });
+        client.subscribe(`/topic/public/${params.id}`, (message) => {
+          console.log(message.body);
+          setValue(JSON.parse(message.body))
+        });
+        setStompClient(client)
       },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setValue(data.data);
-        setTitle(data.title);
-      });
+    });
+    client.activate()
   }, []);
-
-  useEffect(() => {
-    if (value) {
-      console.log(ref.current.getEditor().getContents());
-    }
-  }, [value]);
 
   const handleBack = () => {
     // Handle the save functionality
