@@ -16,7 +16,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 import Dropdown from "react-bootstrap/Dropdown";
 import Container from "react-bootstrap/Container";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-
+ 
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -42,15 +42,15 @@ function Docs(props) {
   ]);
 
   const [users, setUsers] = useState([
-    "Saah",
-    "Salah",
-    "semo",
-    "Saah",
-    "Salah",
-    "semo",
-    "Saah",
-    "Salah",
-    "semo",
+    "Begba",
+    "Doma",
+    "Hamza",
+    "Osama",
+    "Shawky",
+    "Abdullah",
+    "Merwon",
+    "Mehned",
+    "Tamer",
   ]);
 
   const renderTooltipCreate = (props) => (
@@ -128,6 +128,35 @@ function Docs(props) {
 
   const RenameDocument = () => {
     const [rename, setRename] = useState("");
+
+    function DoTheRename() {
+      fetch("/api/v1/docs/rename",{
+        method: 'POST',
+        body: JSON.stringify({Title: rename, docId: selected.docId }),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        }
+      })
+      .then(response => {
+        if (!response.ok) { alert('Title cannot be empty'); }
+        return response.json();
+      })
+      .then(data => {
+        alert('Document renamed successfully');
+        setDocs(prevDocs => prevDocs.map(doc => {
+          if (doc.docId === selected.docId) {
+            return { ...doc, Title: rename };
+          }
+          return doc;
+        }));
+        setShowRename(false)
+      })
+      .catch(error => {
+        console.error('Error occurred while renaming:', error);
+      });
+    }
+
     return (
       <Modal
         aria-labelledby="contained-modal-title-vcenter"
@@ -160,13 +189,37 @@ function Docs(props) {
           <Button variant="danger" onClick={() => setShowRename(false)}>
             Cancel
           </Button>
-          <Button variant="primary">Rename</Button>
+          <Button variant="primary" onClick={DoTheRename}>Rename</Button>
         </Modal.Footer>
       </Modal>
     );
   };
 
   const DeleteDocument = () => {
+
+    function DoTheDelete() {
+      fetch("/api/v1/docs/delete",{
+        method: 'POST',
+        body: JSON.stringify({docId: selected.docId}),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        }
+      })
+      .then(response => {
+        if (!response.ok) { alert('Can not Delete the Document'); }
+        return response.json();
+      })
+      .then(data => {
+        alert('Document deleted successfully');
+        setDocs(prevDocs => prevDocs.filter(doc => doc.docId !== selected.docId));
+        setShowDelete(false)
+      })
+      .catch(error => {
+        console.error('Error occurred while renaming:', error);
+      });
+    }
+
     return (
       <Modal
         aria-labelledby="contained-modal-title-vcenter"
@@ -189,13 +242,52 @@ function Docs(props) {
           <Button variant="secondary" onClick={() => setShowDelete(false)}>
             Cancel
           </Button>
-          <Button variant="danger">Delete</Button>
+          <Button variant="danger" onClick={DoTheDelete}>Delete</Button>
         </Modal.Footer>
       </Modal>
     );
   };
 
   const ShareDocument = () => {
+
+    const [selectedRoles, setSelectedRoles] = useState([]);
+
+    const handleRoleSelect = (userId, role) => {
+      const userIndex = selectedRoles.findIndex(item => item.userId === userId);
+  
+      if (userIndex !== -1) {
+        const updatedSelectedRoles = [...selectedRoles];
+        updatedSelectedRoles[userIndex].role = role;
+        setSelectedRoles(updatedSelectedRoles);
+      } else {
+        setSelectedRoles(prevRoles => [
+          ...prevRoles,
+          { userId, role }
+        ]);
+      }
+    };
+
+    function DoTheShare() {
+      fetch("/api/v1/userdoc/share",{
+        method: 'POST',
+        body: JSON.stringify({ selectedRoles, docId: selected.docId}),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        }
+      })
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        alert('Document shared successfully');
+        setShowShare(false)
+      })
+      .catch(error => {
+        console.error('Error occurred while sharing:', error);
+      });
+    }
+
     return (
       <Modal
         aria-labelledby="contained-modal-title-vcenter"
@@ -240,6 +332,8 @@ function Docs(props) {
                       <Form.Select
                         aria-label="Default select example"
                         style={{ width: "8rem", margin: "auto" }}
+                        onChange={(e) => handleRoleSelect(user, e.target.value)}
+                        value={selectedRoles.find(item => item.userId === user)?.role || 'none'}
                       >
                         <option value="none">None</option>
                         <option value="viewer">Viewer</option>
@@ -256,7 +350,7 @@ function Docs(props) {
           <Button variant="danger" onClick={() => setShowShare(false)}>
             Cancel
           </Button>
-          <Button variant="primary">Save</Button>
+          <Button variant="primary" onClick={DoTheShare}>Save</Button>
         </Modal.Footer>
       </Modal>
     );
@@ -281,18 +375,13 @@ function Docs(props) {
       <Dropdown style={{ zIndex: 2, position: "relative" }} drop={"start"}>
         <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components" />
         <Dropdown.Menu>
-          <Dropdown.Item onClick={() => setShowRename(true)}>
+          <Dropdown.Item onClick={() => {setShowRename(true); setSelected(props.doc);}}>
             Rename
           </Dropdown.Item>
-          <Dropdown.Item
-            onClick={() => {
-              setShowDelete(true);
-              setSelected(props.doc);
-            }}
-          >
+          <Dropdown.Item onClick={() => {setShowDelete(true); setSelected(props.doc);}}>
             Delete
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => setShowShare(true)}>
+          <Dropdown.Item onClick={() => {setShowShare(true);  setSelected(props.doc);}}>
             Share
           </Dropdown.Item>
         </Dropdown.Menu>

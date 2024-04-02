@@ -5,7 +5,13 @@ import java.util.Optional;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+
+
 
 @Service
 public class DocsService {
@@ -23,5 +29,17 @@ public class DocsService {
         return docsRepository.findAll();
     }
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
+    public void updateDocumentName(String id, String newValue) {
+        Query query = new Query(Criteria.where("docId").is(id));
+        Update update = new Update().set("Title", newValue);
+        mongoTemplate.updateFirst(query, update, Docs.class);
+    }
+
+
+    public void DeleteDocumentById(String docId) {
+        docsRepository.deleteByDocId(docId);
+    }
 }
