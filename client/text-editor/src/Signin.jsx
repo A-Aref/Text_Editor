@@ -20,7 +20,7 @@ function Signin(props) {
   const [errorText, setErrorText] = useState("  ");
 
   useEffect(() => {
-      props.setPage('Login')
+    props.setPage('Login')
   })
 
   function Submit() {
@@ -31,12 +31,14 @@ function Signin(props) {
       if (password === "") {
         setErrorText("Enter the password");
       }
-    } else 
-    {
+    } else {
       // Check in database if user exist
       props.setPage('Docs')
       navigate('/Docs')
-      localStorage.setItem('page','Docs')
+      localStorage.setItem('page', 'Docs')
+
+      //dummy id please change it when connect to database
+      props.setUser('u1');
     }
   }
 

@@ -12,6 +12,12 @@ import lombok.NoArgsConstructor;
 
 @Document(collection = "Users_Docs")
 @Data
+
+
+
+
+
+
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDoc {
@@ -20,9 +26,11 @@ public class UserDoc {
     private ObjectId id;
 
     private String role;
-    @DocumentReference
+    
     private String docId;
-    @DocumentReference
+    
     private String userId;
 }
+
+
 
