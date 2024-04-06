@@ -1,44 +1,55 @@
-import "./Signin.css";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useState } from 'react';
 
-import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
-import FloatingLabel from "react-bootstrap/FloatingLabel";
-import "bootstrap/dist/css/bootstrap.min.css";
-
-import IconButton from "@mui/material/IconButton";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import IconButton from '@mui/material/IconButton';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 function Signin(props) {
   const navigate = useNavigate();
-  const [password, setpassword] = useState("");
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(true);
-  const [id, setId] = useState("");
-  const [errorText, setErrorText] = useState("  ");
+  const [email, setEmail] = useState('');
+  const [errorText, setErrorText] = useState('');
 
   useEffect(() => {
-      props.setPage('Login')
-  })
+    props.setPage('Login');
+  }, []);
+// implemented
+async function loginUser(email, password) {
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
 
-  function Submit() {
-    if (id === "" || password === "") {
-      if (id === "") {
-        setErrorText("Enter the email");
-      }
-      if (password === "") {
-        setErrorText("Enter the password");
-      }
-    } else 
-    {
-      // Check in database if user exist
-      props.setPage('Docs')
-      navigate('/Docs')
-      localStorage.setItem('page','Docs')
+    if (!response.ok) {
+      // Handle non-successful response
+      throw new Error('Failed to log in');
     }
+
+    // Assuming response data is JSON
+    const data = await response.json();
+
+    // Redirect to documentation page
+    window.location.href = '/docs'; // Modify this URL as needed
+
+    return data;
+  } catch (error) {
+    console.error('Error logging in:', error);
+    throw error; // Propagate the error up if needed
   }
+}
+
+
 
   return (
     <div id="SigninPage" data-bs-theme="dark" className="md">
@@ -50,9 +61,9 @@ function Signin(props) {
           <Form.Control
             type="email"
             placeholder="name@example.com"
-            value={id}
+            value={email}
             onChange={(e) => {
-              setId(e.target.value);
+              setEmail(e.target.value);
             }}
           />
         </FloatingLabel>
@@ -60,11 +71,11 @@ function Signin(props) {
         <InputGroup className="mb-3">
           <FloatingLabel controlId="floatingPassword" label="Password">
             <Form.Control
-              type={showPassword ? "password" : "text"}
+              type={showPassword ? 'password' : 'text'}
               placeholder="Password"
               value={password}
               onChange={(e) => {
-                setpassword(e.target.value);
+                setPassword(e.target.value);
               }}
             />
           </FloatingLabel>
@@ -72,7 +83,7 @@ function Signin(props) {
             <IconButton
               onClick={() => setShowPassword((prev) => !prev)}
               data-bs-theme="dark"
-              style={{ color: "white" }}
+              style={{ color: 'white' }}
             >
               {showPassword ? (
                 <VisibilityIcon></VisibilityIcon>
@@ -83,7 +94,7 @@ function Signin(props) {
           </InputGroup.Text>
         </InputGroup>
         <br />
-        <button type="submit" id="Signin" onClick={Submit}>
+        <button type="submit" id="Signin" onClick={handleSubmit}>
           Sign in
         </button>
         <br />
