@@ -25,7 +25,6 @@ function TypingArea(props) {
 
  
 
-
   const sendData = (content, delta, source, editor) => {
     if(client.connected) {
       client.publish({
