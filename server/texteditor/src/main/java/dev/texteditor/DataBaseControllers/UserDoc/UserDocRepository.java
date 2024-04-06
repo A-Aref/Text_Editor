@@ -1,4 +1,4 @@
-package dev.texteditor.UserDoc;
+package dev.texteditor.DataBaseControllers.UserDoc;
 
 
 import org.bson.types.ObjectId;
@@ -15,5 +15,6 @@ public interface UserDocRepository extends MongoRepository<UserDoc,ObjectId> {
     
 List<UserDoc> findByUserId(String userId);
 List<UserDoc> findByDocId(String docId);
+void deleteByDocId(String docId);
  
 }

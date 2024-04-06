@@ -1,4 +1,4 @@
-package dev.texteditor.Users;
+package dev.texteditor.DataBaseControllers.Users;
 
 
 import org.bson.types.ObjectId;

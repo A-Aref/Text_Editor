@@ -1,4 +1,4 @@
-package dev.texteditor.Docs;
+package dev.texteditor.DataBaseControllers.Docs;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.texteditor.DataBaseControllers.UserDoc.UserDocService;
+
 
 @RestController
 @CrossOrigin
@@ -24,6 +26,9 @@ public class DocsController {
 
   @Autowired
   private DocsService docsService;
+
+    @Autowired
+  private UserDocService userDocService;
 
     @GetMapping
     public ResponseEntity<List<Docs>> getDocuments() {
@@ -54,7 +59,6 @@ public class DocsController {
     public ResponseEntity<Object> RenameDocument(@RequestBody Map<String,Object> payload) {
       String docId = (String) payload.get("docId");
       String title = (String) payload.get("Title");
-      System.out.println("hello: " + title);
       if(!docsService.getDoc(docId).isPresent()) {
        return ResponseEntity.badRequest().body("Document is not Found");
       }
@@ -68,11 +72,11 @@ public class DocsController {
     @PostMapping("/delete")
     public ResponseEntity<Object> DeleteTheDocument(@RequestBody Map<String,Object> payload) {
       String docId = (String) payload.get("docId");
-      System.out.println("received: " + docId);
       if (!docsService.getDoc(docId).isPresent()) {
         return ResponseEntity.badRequest().body("Document is not Found");
       }
       docsService.DeleteDocumentById(docId);
+      userDocService.DeleteDocumentById(docId);
       return new ResponseEntity<Object>('1', HttpStatus.OK);
     }
     

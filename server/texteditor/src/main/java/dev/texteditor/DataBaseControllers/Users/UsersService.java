@@ -1,4 +1,4 @@
-package dev.texteditor.Users;
+package dev.texteditor.DataBaseControllers.Users;
 
 import java.util.List;
 import java.util.Optional;

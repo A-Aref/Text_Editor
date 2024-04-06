@@ -1,4 +1,4 @@
-package dev.texteditor.Docs;
+package dev.texteditor.DataBaseControllers.Docs;
 
 import java.util.List;
 import java.util.Optional;

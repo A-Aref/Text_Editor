@@ -1,4 +1,4 @@
-package dev.texteditor.Docs;
+package dev.texteditor.DataBaseControllers.Docs;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -14,6 +14,7 @@ public interface DocsRepository extends MongoRepository<Docs,ObjectId> {
 
     void deleteByDocId(String docId);
 
+    @SuppressWarnings({ "null", "unchecked" })
     Docs save(Docs document);
     
 }

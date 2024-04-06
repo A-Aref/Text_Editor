@@ -1,4 +1,4 @@
-package dev.texteditor.UserDoc;
+package dev.texteditor.DataBaseControllers.UserDoc;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DocViewInfo {

@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import dev.texteditor.Docs.DocsController;
+import dev.texteditor.DataBaseControllers.Docs.DocsController;
 
 
 @Controller

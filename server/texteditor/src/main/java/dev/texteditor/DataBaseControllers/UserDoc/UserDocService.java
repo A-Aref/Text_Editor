@@ -1,4 +1,4 @@
-package dev.texteditor.UserDoc;
+package dev.texteditor.DataBaseControllers.UserDoc;
 
 import java.util.List;
 
@@ -24,6 +24,10 @@ public class UserDocService {
 
     public List<UserDoc> getDocUsers(String docId){
         return userDocRepository.findByDocId(docId);
+    }
+
+    public void DeleteDocumentById(String docId) {
+        userDocRepository.deleteByDocId(docId);
     }
 
     @Autowired

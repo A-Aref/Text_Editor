@@ -1,4 +1,4 @@
-package dev.texteditor.Users;
+package dev.texteditor.DataBaseControllers;
 
 import java.util.List;
 
@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import dev.texteditor.DataBaseControllers.Users.Users;
+import dev.texteditor.DataBaseControllers.Users.UsersService;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/mixed")
 @CrossOrigin
-public class UsersController {
+public class MixedController {
 
   @Autowired
   private UsersService usersService;
@@ -35,3 +36,4 @@ public class UsersController {
 
     
 }
+

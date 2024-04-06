@@ -8,11 +8,13 @@ function EntryPoint(props) {
 
     const navigate = useNavigate();
     const page =localStorage.getItem('page')
+    const user =localStorage.getItem('user')
     useEffect(()=>{
         
         if(page === 'Docs')
         {
-            props.setPage('page')
+            props.setPage()
+            props.setUser(user)
             navigate('Docs')
         }
         else

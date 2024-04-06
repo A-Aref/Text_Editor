@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
-import Docs from './Docs.jsx'
+import Docs from './DocComponents/Docs.jsx'
 import Signin from './Signin.jsx'
 import Register from './Register.jsx'
 import EntryPoint from './EntryPoint.jsx';
@@ -17,7 +17,8 @@ function Routing() {
     const [user, setUser] = useState({})
 
 
-    const setToDocs = (() => setPage('Docs'))
+    const setToDocs = () => setPage('Docs')
+    const setUserr = (user) => setUser(user)
 
 
     return (
@@ -25,7 +26,7 @@ function Routing() {
             <Router>
                 <Routes>
 
-                    <Route path='/' element={<EntryPoint setPage={setToDocs} />} />
+                    <Route path='/' element={<EntryPoint setPage={setToDocs} setUser={setUserr}/>} />
                     <Route path='/Login' element={<Signin setPage={setPage} setUser={setUser} />} />
                     <Route path='/Register' element={<Register />} />
                     <Route element={<PrivateRoute viewSet="Docs" view={page} />}>

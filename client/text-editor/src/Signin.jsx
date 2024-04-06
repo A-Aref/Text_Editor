@@ -39,6 +39,7 @@ function Signin(props) {
 
       //dummy id please change it when connect to database
       props.setUser('u1');
+      localStorage.setItem('user', 'u1')
     }
   }
 

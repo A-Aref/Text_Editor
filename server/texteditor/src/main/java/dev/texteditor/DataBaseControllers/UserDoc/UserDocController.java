@@ -1,4 +1,4 @@
-package dev.texteditor.UserDoc;
+package dev.texteditor.DataBaseControllers.UserDoc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.texteditor.Docs.Docs;
-import dev.texteditor.Docs.DocsRepository;
-import dev.texteditor.Docs.DocsService;
+import dev.texteditor.DataBaseControllers.Docs.Docs;
+import dev.texteditor.DataBaseControllers.Docs.DocsRepository;
+import dev.texteditor.DataBaseControllers.Docs.DocsService;
+
 import org.bson.types.ObjectId;
 
 
@@ -39,8 +40,8 @@ public class UserDocController {
   @Autowired
   private DocsRepository docsRepository;
 
-// @PostMapping("/createDoc")
-// @GetMapping("/createDoc/{docTitle,docDesc,userId}")
+
+@SuppressWarnings("unused")
 @PostMapping("/createDoc")
 public ResponseEntity<Object> CreateDocument(@RequestBody Map<String,Object> Parameters)
 {
@@ -54,7 +55,7 @@ public ResponseEntity<Object> CreateDocument(@RequestBody Map<String,Object> Par
   
   Docs DocsRes= docsRepository.save(newDoc);
   if(DocsRes==null)
-  return new ResponseEntity<Object>('1', HttpStatus.NOT_ACCEPTABLE);
+    return new ResponseEntity<Object>('1', HttpStatus.NOT_ACCEPTABLE);
 
   UserDoc newUserDocObjcet = new UserDoc();
   newUserDocObjcet.setUserId((String)Parameters.get("userId"));
@@ -62,17 +63,18 @@ public ResponseEntity<Object> CreateDocument(@RequestBody Map<String,Object> Par
   newUserDocObjcet.setDocId(generatedId.toString());
   UserDoc userDocRes = userDocRepository.save(newUserDocObjcet);
    
-  if(userDocRes == null)
-  return new ResponseEntity<Object>('1', HttpStatus.NOT_ACCEPTABLE);
+
+  if(userDocRes==null)
+    return new ResponseEntity<Object>('1', HttpStatus.NOT_ACCEPTABLE);
   
-    return new ResponseEntity<Object>('1', HttpStatus.OK);
+  return new ResponseEntity<Object>('1', HttpStatus.OK);
  
 }
   @GetMapping("/documents/{userId}")
   public ResponseEntity<List<DocViewInfo>> getDocuments(@PathVariable String userId) {
  
     List<UserDoc> UserDocInfo =userDocService.getUserDocs(userId);
-    List<DocViewInfo> docViewInfo=new  ArrayList<>();;
+    List<DocViewInfo> docViewInfo=new  ArrayList<>();
       
     for (UserDoc i: UserDocInfo)
     {
@@ -80,7 +82,6 @@ public ResponseEntity<Object> CreateDocument(@RequestBody Map<String,Object> Par
     Docs docObj=doc.orElse(new Docs());
     DocViewInfo newObj = new DocViewInfo(docObj.getTitle(),i.getRole(), docObj.getDesc(),i.getDocId());
     docViewInfo.add(newObj);
-    System.out.println(docObj.getDesc());
     }
     
     return new ResponseEntity<List<DocViewInfo>>(docViewInfo, HttpStatus.OK);
