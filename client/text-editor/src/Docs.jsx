@@ -16,7 +16,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 import Dropdown from "react-bootstrap/Dropdown";
 import Container from "react-bootstrap/Container";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
- 
+
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -29,17 +29,12 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 
 function Docs(props) {
   const navigate = useNavigate();
-  const [docs, setDocs] = useState([
-    { Title: "sale", Role: "Owner", Desc: "ay7aga",docId:"htu59"},
-    { Title: "sales3.txt", Role: "Editor", Desc: "ay7aga",docId:"htu9" },
-    { Title: "sales1.txt", Role: "Owner", Desc: "ay7aga",docId:"htu9" },
-    { Title: "sales4.txt", Role: "Viewer", Desc: "ay7aga",docId:"htu9" },
-    { Title: "sales4.txt", Role: "Editor", Desc: "ay7aga",docId:"htu9" },
-    { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga",docId:"htu9" },
-    { Title: "sales4.txt", Role: "Editor", Desc: "ay7aga",docId:"htu9" },
-    { Title: "sales4.txt", Role: "Owner", Desc: "ay7aga",docId:"htu9" },
-    { Title: "sales4.txt", Role: "Viewer", Desc: "ay7aga",docId:"htu9" },
-  ]);
+  const [docs, setDocs] = useState([]);
+  const [showCreate, setShowCreate] = useState(false);
+  const [showRename, setShowRename] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [selected, setSelected] = useState({});
 
   const [users, setUsers] = useState([
     "Begba",
@@ -53,6 +48,21 @@ function Docs(props) {
     "Tamer",
   ]);
 
+  useEffect(() => {
+    GetUserDocs();
+  }, [])
+
+  async function GetUserDocs() {
+
+    const response = await fetch(`http://localhost:8081/api/v1/userdoc/documents/${props.userId}`);
+    if (!(response.ok)) {
+      alert("Error in fetching user documents");
+      return;
+    }
+    const data = await response.json();
+    setDocs(data);
+  }
+
   const renderTooltipCreate = (props) => (
     <Tooltip id="button-tooltip" {...props} data-bs-theme="dark">
       Create new document
@@ -64,19 +74,42 @@ function Docs(props) {
       LogOut
     </Tooltip>
   );
-  const [showCreate, setShowCreate] = useState(false);
-  const [showRename, setShowRename] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
-  const [showShare, setShowShare] = useState(false);
-  const [selected, setSelected] = useState({});
+
+
 
   const CreateDocument = () => {
-    const [name, setName] = useState("");
-    const [desc, setDesc] = useState("");
+    const [newDocTitle, setnewDocTitle] = useState("");
+    const [newDocDesc, setnewDocDesc] = useState("");
+    const [enableCreate, setenableCreate] = useState(false);
+    useEffect(() => {
+      if (!(newDocTitle === ""))
+        setenableCreate(false);
+      else
+        setenableCreate(true);
 
-    function addDocument() {
-      const document = { Title: name, Role: "Owner", Desc: desc }
-      setDocs([...docs,document])
+    }, [newDocTitle])
+
+    function CreateDocApi() {
+      fetch("http://localhost:8081/api/v1/userdoc/createDoc", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: "application/json"
+        },
+        body: JSON.stringify({ docTitle: newDocTitle, docDesc: newDocDesc, userId: props.userId }),
+      })
+        .then(response => {
+          if (response.ok) {
+            return response.json(); // If the response is JSON, parse it
+          } else {
+            throw new Error('Request failed');
+          }
+        })
+        .then(GetUserDocs)
+        .catch(error => {
+          console.error('Error occurred ', error);
+        });
+
     }
     return (
       <Modal
@@ -98,9 +131,9 @@ function Docs(props) {
           <Form.Control
             id="name"
             type="text"
-            value={name}
+            value={newDocTitle}
             onChange={(e) => {
-              setName(e.target.value);
+              setnewDocTitle(e.target.value);
             }}
             autoFocus
             placeholder="Doc1"
@@ -110,9 +143,9 @@ function Docs(props) {
             id="desc"
             as="textarea"
             rows={2}
-            value={desc}
+            value={newDocDesc}
             onChange={(e) => {
-              setDesc(e.target.value);
+              setnewDocDesc(e.target.value);
             }}
           />
         </Modal.Body>
@@ -120,7 +153,8 @@ function Docs(props) {
           <Button variant="danger" onClick={() => setShowCreate(false)}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={() => {addDocument();setShowCreate(false);}}>Create</Button>
+          <Button disabled={enableCreate}
+            variant="primary" onClick={() => { CreateDocApi(); setShowCreate(false); }}>Create</Button>
         </Modal.Footer>
       </Modal>
     );
@@ -130,31 +164,31 @@ function Docs(props) {
     const [rename, setRename] = useState("");
 
     function DoTheRename() {
-      fetch("/api/v1/docs/rename",{
+      fetch("/api/v1/docs/rename", {
         method: 'POST',
-        body: JSON.stringify({Title: rename, docId: selected.docId }),
+        body: JSON.stringify({ Title: rename, docId: selected.docId }),
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         }
       })
-      .then(response => {
-        if (!response.ok) { alert('Title cannot be empty'); }
-        return response.json();
-      })
-      .then(data => {
-        alert('Document renamed successfully');
-        setDocs(prevDocs => prevDocs.map(doc => {
-          if (doc.docId === selected.docId) {
-            return { ...doc, Title: rename };
-          }
-          return doc;
-        }));
-        setShowRename(false)
-      })
-      .catch(error => {
-        console.error('Error occurred while renaming:', error);
-      });
+        .then(response => {
+          if (!response.ok) { alert('Title cannot be empty'); }
+          return response.json();
+        })
+        .then(data => {
+          alert('Document renamed successfully');
+          setDocs(prevDocs => prevDocs.map(doc => {
+            if (doc.docId === selected.docId) {
+              return { ...doc, Title: rename };
+            }
+            return doc;
+          }));
+          setShowRename(false)
+        })
+        .catch(error => {
+          console.error('Error occurred while renaming:', error);
+        });
     }
 
     return (
@@ -198,26 +232,26 @@ function Docs(props) {
   const DeleteDocument = () => {
 
     function DoTheDelete() {
-      fetch("/api/v1/docs/delete",{
+      fetch("/api/v1/docs/delete", {
         method: 'POST',
-        body: JSON.stringify({docId: selected.docId}),
+        body: JSON.stringify({ docId: selected.docId }),
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         }
       })
-      .then(response => {
-        if (!response.ok) { alert('Can not Delete the Document'); }
-        return response.json();
-      })
-      .then(data => {
-        alert('Document deleted successfully');
-        setDocs(prevDocs => prevDocs.filter(doc => doc.docId !== selected.docId));
-        setShowDelete(false)
-      })
-      .catch(error => {
-        console.error('Error occurred while renaming:', error);
-      });
+        .then(response => {
+          if (!response.ok) { alert('Can not Delete the Document'); }
+          return response.json();
+        })
+        .then(data => {
+          alert('Document deleted successfully');
+          setDocs(prevDocs => prevDocs.filter(doc => doc.docId !== selected.docId));
+          setShowDelete(false)
+        })
+        .catch(error => {
+          console.error('Error occurred while renaming:', error);
+        });
     }
 
     return (
@@ -254,7 +288,7 @@ function Docs(props) {
 
     const handleRoleSelect = (userId, role) => {
       const userIndex = selectedRoles.findIndex(item => item.userId === userId);
-  
+
       if (userIndex !== -1) {
         const updatedSelectedRoles = [...selectedRoles];
         updatedSelectedRoles[userIndex].role = role;
@@ -268,24 +302,24 @@ function Docs(props) {
     };
 
     function DoTheShare() {
-      fetch("/api/v1/userdoc/share",{
+      fetch("/api/v1/userdoc/share", {
         method: 'POST',
-        body: JSON.stringify({ selectedRoles, docId: selected.docId}),
+        body: JSON.stringify({ selectedRoles, docId: selected.docId }),
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         }
       })
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        alert('Document shared successfully');
-        setShowShare(false)
-      })
-      .catch(error => {
-        console.error('Error occurred while sharing:', error);
-      });
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          alert('Document shared successfully');
+          setShowShare(false)
+        })
+        .catch(error => {
+          console.error('Error occurred while sharing:', error);
+        });
     }
 
     return (
@@ -375,13 +409,13 @@ function Docs(props) {
       <Dropdown style={{ zIndex: 2, position: "relative" }} drop={"start"}>
         <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components" />
         <Dropdown.Menu>
-          <Dropdown.Item onClick={() => {setShowRename(true); setSelected(props.doc);}}>
+          <Dropdown.Item onClick={() => { setShowRename(true); setSelected(props.doc); }}>
             Rename
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => {setShowDelete(true); setSelected(props.doc);}}>
+          <Dropdown.Item onClick={() => { setShowDelete(true); setSelected(props.doc); }}>
             Delete
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => {setShowShare(true);  setSelected(props.doc);}}>
+          <Dropdown.Item onClick={() => { setShowShare(true); setSelected(props.doc); }}>
             Share
           </Dropdown.Item>
         </Dropdown.Menu>
@@ -407,33 +441,33 @@ function Docs(props) {
 
   const LogOut = () => {
     props.setPage('Login')
-    localStorage.setItem('page','Login')
+    localStorage.setItem('page', 'Login')
   };
 
   const openEditor = (doc) => {
     props.setPage('Editor')
     navigate(`/Docs/${doc.docId}`)
-    props.setEdit(doc.Role === "Viewer" ? true:false)
+    props.setEdit(doc.Role === "Viewer" ? true : false)
   }
 
   return (
     <div className="md mt-3">
       <Navbar className="mb-4">
-      <OverlayTrigger
-        placement="bottom"
-        delay={{ show: 250, hide: 400 }}
-        overlay={renderTooltiplogOut}
-      >
-        <Button
-          variant="danger"
-          className="me-4 mt-4 rounded-pill"
-          size="md"
-          style={{ position: "absolute", right: 0 }}
-          onClick={LogOut}
+        <OverlayTrigger
+          placement="bottom"
+          delay={{ show: 250, hide: 400 }}
+          overlay={renderTooltiplogOut}
         >
-          <LogoutIcon />
-        </Button>
-      </OverlayTrigger>
+          <Button
+            variant="danger"
+            className="me-4 mt-4 rounded-pill"
+            size="md"
+            style={{ position: "absolute", right: 0 }}
+            onClick={LogOut}
+          >
+            <LogoutIcon />
+          </Button>
+        </OverlayTrigger>
       </Navbar>
       <Container data-bs-theme="dark" className="md">
         <Row >
@@ -490,8 +524,8 @@ function Docs(props) {
                           >
                             {doc.Desc}
                           </Card.Text>
-                          <div style={{justifyContent:"right",display:"flex"}}>
-                          <Button variant="outline-secondary" onClick={() => openEditor(doc)}>Open</Button>
+                          <div style={{ justifyContent: "right", display: "flex" }}>
+                            <Button variant="outline-secondary" onClick={() => openEditor(doc)}>Open</Button>
                           </div>
                         </Card.Body>
                       </Card>
@@ -539,8 +573,8 @@ function Docs(props) {
                           >
                             {doc.Desc}
                           </Card.Text>
-                          <div style={{justifyContent:"right",display:"flex"}}>
-                          <Button variant="outline-secondary" onClick={() => openEditor(doc)}>Open</Button>
+                          <div style={{ justifyContent: "right", display: "flex" }}>
+                            <Button variant="outline-secondary" onClick={() => openEditor(doc)}>Open</Button>
                           </div>
                         </Card.Body>
                       </Card>

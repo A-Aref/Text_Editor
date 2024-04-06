@@ -29,7 +29,7 @@ function Routing() {
                     <Route path='/Login' element={<Signin setPage={setPage} setUser={setUser} />} />
                     <Route path='/Register' element={<Register />} />
                     <Route element={<PrivateRoute viewSet="Docs" view={page} />}>
-                        <Route path='/Docs' element={<Docs setPage={setPage} setEdit={setEdit} />} />
+                        <Route path='/Docs' element={<Docs setPage={setPage} setEdit={setEdit} userId={user} />} />
                     </Route>
                     <Route element={<PrivateRoute viewSet="Editor" view={page} />}>
                         <Route path='/Docs/:id' element={<TypingArea setPage={setPage} edit={edit} />} />
