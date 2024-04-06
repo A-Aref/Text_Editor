@@ -1,12 +1,9 @@
 import "./Register.css";
-import { useNavigate,Link } from "react-router-dom";
-
+import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import "bootstrap/dist/css/bootstrap.min.css";
-
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import IconButton from "@mui/material/IconButton";
@@ -15,29 +12,44 @@ function Register(props) {
   const navigate = useNavigate();
   const [errorText, setErrorText] = useState("");
   const [name, setName] = useState("");
-  const [email, setemail] = useState("");
-  const [pass, setpass] = useState("");
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
   const [showPassword, setShowPassword] = useState(true);
-  const [populated, setPopulated] = useState(false);
 
-  function reset() {
-    setpass("");
-    setemail("");
-    setName("");
-    setPopulated(false);
-  }
-
-  function Registerbutt() {
-    setPopulated(true);
+  async function Registerbutt() {
     if (!/^[a-zA-Z]+$/.test(name.trim())) {
-      setPopulated(false);
-      alert("Please enter First name.");
-    } else if (!email.trim()) {
-      setPopulated(false);
-      alert("Email is missing");
-    } else if (!pass.trim()) {
-      setPopulated(false);
-      alert("password is missing");
+      setErrorText("Please enter a valid name.");
+      return;
+    }
+    if (!email.trim()) {
+      setErrorText("Email is missing.");
+      return;
+    }
+    if (!pass.trim()) {
+      setErrorText("Password is missing.");
+      return;
+    }
+    
+    try {
+      const response = await fetch('http://localhost:8092/api/v1/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, pass }),
+      });
+
+      if (response.ok) {
+        // Registration successful, redirect to login page
+        navigate('/Login');
+      } else {
+        // Registration failed, handle error response
+        const data = await response.json();
+        setErrorText(data.message || 'Registration failed.');
+      }
+    } catch (error) {
+      console.error('Error registering:', error);
+      setErrorText('msh fahem.');
     }
   }
 
@@ -53,18 +65,14 @@ function Register(props) {
             id="name"
             type="text"
             value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
+            onChange={(e) => setName(e.target.value)}
           />
           <Form.Label htmlFor="email">Email</Form.Label>
           <Form.Control
             id="email"
-            type="text"
+            type="email"
             value={email}
-            onChange={(e) => {
-              setemail(e.target.value);
-            }}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <Form.Label htmlFor="Pass">Password</Form.Label>
           <InputGroup className="mb-3">
@@ -73,9 +81,7 @@ function Register(props) {
               type={showPassword ? "password" : "text"}
               placeholder="Password"
               value={pass}
-              onChange={(e) => {
-                setpass(e.target.value);
-              }}
+              onChange={(e) => setPass(e.target.value)}
             />
             <InputGroup.Text>
               <IconButton
@@ -84,9 +90,9 @@ function Register(props) {
                 style={{ color: "white" }}
               >
                 {showPassword ? (
-                  <VisibilityIcon></VisibilityIcon>
+                  <VisibilityIcon />
                 ) : (
-                  <VisibilityOffIcon></VisibilityOffIcon>
+                  <VisibilityOffIcon />
                 )}
               </IconButton>
             </InputGroup.Text>
@@ -96,7 +102,9 @@ function Register(props) {
           <button id="reg" onClick={Registerbutt}>
             Register
           </button>
-          <p>Already have an account? <Link to="/Login">Sign in</Link></p>
+          <p>
+            Already have an account? <Link to="/Login">Sign in</Link>
+          </p>
         </div>
       </fieldset>
     </div>
