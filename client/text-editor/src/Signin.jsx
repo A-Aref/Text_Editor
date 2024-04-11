@@ -1,75 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import IconButton from '@mui/material/IconButton';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+import "bootstrap/dist/css/bootstrap.min.css";
+import IconButton from "@mui/material/IconButton";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+
+import "./Signin.css"
 
 function Signin(props) {
   const navigate = useNavigate();
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(true);
-  const [email, setEmail] = useState('');
-  const [errorText, setErrorText] = useState('');
+  const [email, setEmail] = useState("");
+  const [errorText, setErrorText] = useState("");
 
   useEffect(() => {
-    props.setPage('Login');
+    props.setPage("Login");
   }, []);
-// implemented
-async function loginUser(email, password) {
-  try {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
-    });
-
-    if (!response.ok) {
-      // Handle non-successful response
-      throw new Error('Failed to log in');
-    }
-
-    // Assuming response data is JSON
-    const data = await response.json();
-
-    // Redirect to documentation page
-    window.location.href = '/docs'; // Modify this URL as needed
-
-    return data;
-  } catch (error) {
-    console.error('Error logging in:', error);
-    throw error; // Propagate the error up if needed
-  }
-}
-
-
-    props.setPage('Login')
-  })
 
   function Submit() {
-    if (id === "" || password === "") {
-      if (id === "") {
+    if (email === "" || password === "") {
+      if (email === "") {
         setErrorText("Enter the email");
       }
       if (password === "") {
         setErrorText("Enter the password");
       }
     } else {
-      // Check in database if user exist
-      props.setPage('Docs')
-      navigate('/Docs')
-      localStorage.setItem('page', 'Docs')
+      fetch("/api/v1/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email, password: password }),
+      }).catch((error) => console.log(error))
+        .then((response) => {
+          const status = response.status;
+          if (status === 200) {
+          } else {
+            console.log(response.statusText)
+          }
+          return response
+        })
+        .then((data) => {
+          if(data.status !== 200)
+          {
+            console.log(data)
+          }
+          else
+          {
+          props.setPage("Docs");
+          navigate("/Docs");
+          localStorage.setItem("page", "Docs");
 
-      //dummy id please change it when connect to database
-      props.setUser('u1');
-      localStorage.setItem('user', 'u1')
+          props.setUser(email);
+          localStorage.setItem("user", email);
+          }
+        })
     }
   }
 
@@ -93,7 +85,7 @@ async function loginUser(email, password) {
         <InputGroup className="mb-3">
           <FloatingLabel controlId="floatingPassword" label="Password">
             <Form.Control
-              type={showPassword ? 'password' : 'text'}
+              type={showPassword ? "password" : "text"}
               placeholder="Password"
               value={password}
               onChange={(e) => {
@@ -105,7 +97,7 @@ async function loginUser(email, password) {
             <IconButton
               onClick={() => setShowPassword((prev) => !prev)}
               data-bs-theme="dark"
-              style={{ color: 'white' }}
+              style={{ color: "white" }}
             >
               {showPassword ? (
                 <VisibilityIcon></VisibilityIcon>
@@ -116,7 +108,7 @@ async function loginUser(email, password) {
           </InputGroup.Text>
         </InputGroup>
         <br />
-        <button type="submit" id="Signin" onClick={handleSubmit}>
+        <button type="submit" id="Signin" onClick={Submit}>
           Sign in
         </button>
         <br />

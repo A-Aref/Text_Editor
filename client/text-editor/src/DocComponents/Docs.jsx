@@ -44,12 +44,15 @@ function Docs(props) {
   async function GetUserDocs() {
 
     const response = await fetch(`/api/v1/userdoc/documents/${props.userId}`);
-    if (!(response.ok)) {
-      alert("Error in fetching user documents");
-      return;
+    if (response.status === 200) {
+      const data = await response.json();
+      setDocs(data);
     }
-    const data = await response.json();
-    setDocs(data);
+    if(response.status === 204) {
+      console.log("No user documents");
+    }
+    return;
+    
   }
 
   const renderTooltipCreate = (props) => (
@@ -118,6 +121,7 @@ function Docs(props) {
   const LogOut = () => {
     props.setPage('Login')
     localStorage.setItem('page', 'Login')
+    localStorage.setItem('user',"")
   };
 
   const openEditor = (doc) => {
@@ -232,7 +236,7 @@ function Docs(props) {
                               }}
                             >
                               <h2>{doc.Title}</h2>
-                              {doc.Role === "Viewer" ? (
+                              {doc.Role === "viewer" ? (
                                 <IconButton style={{ color: "white" }} disabled>
                                   <VisibilityIcon fontSize="medium" />
                                 </IconButton>
@@ -263,7 +267,7 @@ function Docs(props) {
         </Row>
       </Container>
       
-      <ShareDocument showShare={showShare}  setShowShare={setShowShare} selected={selected}/>
+      <ShareDocument showShare={showShare}  setShowShare={setShowShare} selected={selected} userId={props.userId}/>
       <RenameDocument showRename={showRename}  setShowRename={setShowRename} selected={selected} setDocs={setDocs}/>
       <DeleteDocument showDelete={showDelete}  setShowDelete={setShowDelete} selected={selected} setDocs={setDocs}/>
       <CreateDocument showCreate={showCreate}  setShowCreate={setShowCreate} GetUserDocs={GetUserDocs} selected={selected} userId={props.userId}/>

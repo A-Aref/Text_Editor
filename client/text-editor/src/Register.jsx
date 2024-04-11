@@ -31,12 +31,12 @@ function Register(props) {
     }
     
     try {
-      const response = await fetch('http://localhost:8092/api/v1/users/register', {
+      const response = await fetch('/api/v1/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, pass }),
+        body: JSON.stringify({ name:name, email:email, pass:pass }),
       });
 
       if (response.ok) {

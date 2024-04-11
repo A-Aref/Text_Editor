@@ -1,6 +1,7 @@
 package dev.texteditor.DataBaseControllers.UserDoc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,11 +72,17 @@ public ResponseEntity<Object> CreateDocument(@RequestBody Map<String,Object> Par
  
 }
   @GetMapping("/documents/{userId}")
-  public ResponseEntity<List<DocViewInfo>> getDocuments(@PathVariable String userId) {
+  public ResponseEntity<Object> getDocuments(@PathVariable String userId) {
  
     List<UserDoc> UserDocInfo =userDocService.getUserDocs(userId);
     List<DocViewInfo> docViewInfo=new  ArrayList<>();
       
+    if(UserDocInfo.size() == 0)
+    {
+      Map<String,String> m = new HashMap<String,String>();
+      m.put("Text","hello");
+      return new ResponseEntity<Object>(m, HttpStatus.NO_CONTENT);
+    }
     for (UserDoc i: UserDocInfo)
     {
     Optional<Docs> doc=  docsService.getDoc(i.getDocId());
@@ -84,7 +91,7 @@ public ResponseEntity<Object> CreateDocument(@RequestBody Map<String,Object> Par
     docViewInfo.add(newObj);
     }
     
-    return new ResponseEntity<List<DocViewInfo>>(docViewInfo, HttpStatus.OK);
+    return new ResponseEntity<Object>(docViewInfo, HttpStatus.OK);
 
 	}
 
@@ -96,17 +103,18 @@ public ResponseEntity<Object> CreateDocument(@RequestBody Map<String,Object> Par
   @PostMapping("/share")
   public ResponseEntity<Object> ShareDocument(@RequestBody Map<String,Object> payload) {
     @SuppressWarnings("unchecked")
-    List<Map<String, String>> userRoles = (List<Map<String, String>>) payload.get("selectedRoles");
+    List<Map<String, String>> userRoles = (List<Map<String, String>>) payload.get("users");
     String docId = (String)payload.get("docId");
-    if(!userDocService.getDocUsers(docId).isEmpty()) {
+    //if(!userDocService.getDocUsers(docId).isEmpty()) {
       for (Map<String, String> userRole : userRoles) {
-        String userId = userRole.get("userId");
+        String userId = userRole.get("email");
         String role = userRole.get("role");
+        System.out.println(userId);
         userDocService.updateSharedAccess(userId, docId, role);
       }
       return new ResponseEntity<Object>('1', HttpStatus.OK);
-    }
-    return new ResponseEntity<Object>('1', HttpStatus.OK);
+    //}
+    //return new ResponseEntity<Object>('1', HttpStatus.OK);
   }
 
 }

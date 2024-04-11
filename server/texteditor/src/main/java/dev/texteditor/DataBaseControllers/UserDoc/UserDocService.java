@@ -37,7 +37,7 @@ public class UserDocService {
         Criteria criteria = Criteria.where("userId").is(UserId).and("docId").is(DocId);
         Query query = new Query(criteria);
         Update update = new Update().set("role", Role);
-        //mongoTemplate.updateFirst(query, update, UserDoc.class);
+        mongoTemplate.updateFirst(query, update, UserDoc.class);
     }
 
 }

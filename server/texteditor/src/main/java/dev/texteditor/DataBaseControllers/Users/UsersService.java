@@ -28,18 +28,11 @@ public class UsersService {
         return usersRepository.existsByEmail(email);
     }
 
-    public void registerUser(Users user) {
-        // Perform additional validation if needed
-        if (user == null || user.getName() == null || user.getEmail() == null || user.getPassword() == null) 
-        {
-            throw new IllegalArgumentException("User data is incomplete");
-        }
-        
-        // Check if user with the same email already exists
-        if (usersRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("User with this email already exists");
-        }
-        
+    public void registerUser(String email,String name,String pass) {
+        Users user = new Users();
+        user.setEmail(email);
+        user.setName(name);
+        user.setPassword(pass);
         // Save the user to the repository
         usersRepository.save(user);
     }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -28,14 +29,14 @@ public class UsersController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody Users user) {
+    public ResponseEntity<String> registerUser(@RequestBody Map<String,String> payload) {
         try {
-            boolean userExists = usersService.checkIfUserExists(user.getEmail());
+            boolean userExists = usersService.checkIfUserExists(payload.get("email"));
             if (userExists) {
                 return new ResponseEntity<>("User with this email already exists", HttpStatus.BAD_REQUEST);
             }
 
-            usersService.registerUser(user);
+            usersService.registerUser(payload.get("email"),payload.get("name"),payload.get("pass"));
 
             return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
         } catch (Exception e) {
@@ -44,19 +45,15 @@ public class UsersController {
     }
 
     @PostMapping("/login") // New endpoint for user login
-    public ResponseEntity<String> loginUser(@RequestBody Users user) {
+    public ResponseEntity<String> loginUser(@RequestBody Map<String,String> payload) {
         try {
-            boolean isValidCredentials = usersService.validateUserCredentials(user.getEmail(), user.getPassword());
+            boolean isValidCredentials = usersService.validateUserCredentials(payload.get("email"), payload.get("password"));
             if (!isValidCredentials) {
-                return new ResponseEntity<>("Invalid email or password", HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<String>("Invalid email or password", HttpStatus.UNAUTHORIZED);
             }
-
-            // If credentials are valid, return success message or token
-            // You can generate and return a JWT token for authenticated users
-
-            return new ResponseEntity<>("Login successful", HttpStatus.OK);
+            return new ResponseEntity<String>("Login successful", HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error logging in: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>("Error logging in: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
