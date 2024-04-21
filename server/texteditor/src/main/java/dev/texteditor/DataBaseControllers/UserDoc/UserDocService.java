@@ -52,7 +52,7 @@ public class UserDocService {
 
     public void createSharedAccess(String userId, String docId, String role) {
         ObjectId generatedId = new ObjectId();
-        UserDoc userDoc = new UserDoc(generatedId, userId, docId, role);
+        UserDoc userDoc = new UserDoc(generatedId, role, docId, userId);
         mongoTemplate.insert(userDoc);
     }
 

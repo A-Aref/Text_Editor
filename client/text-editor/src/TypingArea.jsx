@@ -6,6 +6,7 @@ import Navbar from "react-bootstrap/Navbar";
 import SaveIcon from "@mui/icons-material/Save";
 import IconButton from "@mui/material/IconButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import RestoreIcon from '@mui/icons-material/Restore';
 
 import ReactQuill, { Quill } from "react-quill";
 
@@ -37,7 +38,7 @@ function TypingArea(props) {
 
   useEffect(() => {
     const client = new Client({
-      brokerURL: "ws://localhost:8080/api",
+      brokerURL: "ws://localhost:8081/api",
       onConnect: () => {
         client.subscribe(`/app/sub/${params.id}`, (message) => {
           setValue(JSON.parse(message.body))
@@ -78,9 +79,15 @@ function TypingArea(props) {
               <button className="edit-button ql-bold" />
               <button className=" edit-button ql-italic" />
             </div>
+            <div style={{ display: "flex" }}>
             <button className=" edit-button" onClick={handleSave}>
               <SaveIcon className="saveIcon" sx={{ fontSize: 44 }} />
             </button>
+            <button className=" edit-button" onClick={handleSave}>
+              <RestoreIcon className="saveIcon" sx={{ fontSize: 44 }} />
+            </button>
+            </div>
+            
           </div>
         ) : (
           <div id="my-quill-toolbar"></div>

@@ -35,7 +35,7 @@ public class MixedController {
   @PostMapping("/getUsers")
   public ResponseEntity<List<ShareUser>> getUsers(@RequestBody Map<String,String> payload) {
     List<Users> listUsers = usersService.getAllUsers();
-    List<UserDoc> listAcces = userDocService.getDocUsers(payload.get("docId"));
+    List<UserDoc> listAccess = userDocService.getDocUsers(payload.get("docId"));
     Map<String,Integer> map = new HashMap<String,Integer>();
     List<ShareUser> listNew = new ArrayList<ShareUser>();
 
@@ -48,7 +48,7 @@ public class MixedController {
       listNew.add(x);
     }
     
-    for (UserDoc i : listAcces) {
+    for (UserDoc i : listAccess) {
       ShareUser x = listNew.get(map.get(i.getUserId()));
       x.setRole(i.getRole());
       listNew.set(map.get(i.getUserId()),x);

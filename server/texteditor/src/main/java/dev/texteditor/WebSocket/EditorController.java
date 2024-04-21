@@ -4,6 +4,7 @@ package dev.texteditor.WebSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+//import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -28,6 +29,17 @@ public class EditorController {
     @Autowired
     private DocsController docsController;
     HashMap<String, List<Object>> myMap = new HashMap<String,List<Object>>();
+
+    // HashMap<String, List<List<Character>>> myMapChar = new HashMap<String,List<List<Character>>>();
+
+    // @MessageMapping("/{id}/chat.sendData")
+    // @SendTo("/topic/public/{id}")
+    // public Object sendDatas(@Payload Map<String,Object> map,@DestinationVariable String id){
+    //     for (Object data : map.values()) {
+    //         data.getClass();
+    //     }
+    //     return myMap.get(id).get(1);
+    // }
 
     @MessageMapping("/{id}/chat.sendData")
     @SendTo("/topic/public/{id}")
