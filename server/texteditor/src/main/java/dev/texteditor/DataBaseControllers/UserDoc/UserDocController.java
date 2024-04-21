@@ -105,16 +105,19 @@ public ResponseEntity<Object> CreateDocument(@RequestBody Map<String,Object> Par
     @SuppressWarnings("unchecked")
     List<Map<String, String>> userRoles = (List<Map<String, String>>) payload.get("users");
     String docId = (String)payload.get("docId");
-    //if(!userDocService.getDocUsers(docId).isEmpty()) {
-      for (Map<String, String> userRole : userRoles) {
-        String userId = userRole.get("email");
-        String role = userRole.get("role");
-        System.out.println(userId);
+
+    for (Map<String, String> userRole : userRoles) {
+      String userId = userRole.get("email");
+      String role = userRole.get("role");
+      
+      if (userDocService.checker(userId, docId)) {
         userDocService.updateSharedAccess(userId, docId, role);
+      } else {
+        userDocService.createSharedAccess(userId, docId, role);
       }
-      return new ResponseEntity<Object>('1', HttpStatus.OK);
-    //}
-    //return new ResponseEntity<Object>('1', HttpStatus.OK);
+
+    }
+    return new ResponseEntity<Object>('1', HttpStatus.OK);
   }
 
 }
