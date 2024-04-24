@@ -130,12 +130,7 @@ function TypingArea(props) {
   };
 
   const handleDisplayHistoryText = (text) => {
-
     setValue(text);
-    console.log(text);
-    console.log(props.currentText);
-    console.log(selectedIndex);
-
   }
 
 
