@@ -9,6 +9,10 @@
   background-color: #aee1cd;
   color: rgb(0, 89, 255);
 }
+.edit-button:disabled {
+  background-color: black;
+  color: black;
+}
 
 #my-quill-toolbar {
   border: none;
@@ -29,7 +33,13 @@
 #my-quill-toolbar .ql-italic:hover {
   background-color: #aee1cd;
 }
+#my-quill-toolbar .ql-bold:disabled,
+#my-quill-toolbar .ql-italic:disabled{
+  background-color: #0a0a0a;
+  color: #010e08;
+  text-decoration-color: #010e08;
 
+}
 
 .ql-editor,.ql-container,#editor{
   background-color: #1a1a1a;
@@ -39,4 +49,25 @@
   border-radius: 10px;
   font-size: 18px;
   font-family: "Courier New", monospace;
+  flex-grow: 1;
+}
+
+ div#sideHistory{
+  background-color: #717272;
+  font-family: "Courier New", monospace;
+  height: 80vh;
+ }
+ 
+ #historyButton{
+  background-color: #0a0a0a;
+  color: rgb(0, 89, 255);
+ }
+ #historyButton:hover
+ {
+  background-color: rgb(12, 55, 162);
+  color:black;
+ }
+ 
+ .blue-background {
+  background-color: blue;
 }

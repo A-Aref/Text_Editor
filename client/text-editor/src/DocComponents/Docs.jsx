@@ -35,7 +35,7 @@ function Docs(props) {
   const [showShare, setShowShare] = useState(false);
   const [selected, setSelected] = useState({});
 
-  
+
 
   useEffect(() => {
     GetUserDocs();
@@ -48,11 +48,11 @@ function Docs(props) {
       const data = await response.json();
       setDocs(data);
     }
-    if(response.status === 204) {
+    if (response.status === 204) {
       console.log("No user documents");
     }
     return;
-    
+
   }
 
   const renderTooltipCreate = (props) => (
@@ -121,13 +121,14 @@ function Docs(props) {
   const LogOut = () => {
     props.setPage('Login')
     localStorage.setItem('page', 'Login')
-    localStorage.setItem('user',"")
+    localStorage.setItem('user', "")
   };
 
   const openEditor = (doc) => {
     props.setPage('Editor')
     navigate(`/Docs/${doc.docId}`)
     props.setEdit(doc.Role === "Viewer" ? true : false)
+    props.setCurrentOpenDoc(doc.docId);
   }
 
   return (
@@ -266,11 +267,11 @@ function Docs(props) {
           </Col>
         </Row>
       </Container>
-      
-      <ShareDocument showShare={showShare}  setShowShare={setShowShare} selected={selected} userId={props.userId}/>
-      <RenameDocument showRename={showRename}  setShowRename={setShowRename} selected={selected} setDocs={setDocs}/>
-      <DeleteDocument showDelete={showDelete}  setShowDelete={setShowDelete} selected={selected} setDocs={setDocs}/>
-      <CreateDocument showCreate={showCreate}  setShowCreate={setShowCreate} GetUserDocs={GetUserDocs} selected={selected} userId={props.userId}/>
+
+      <ShareDocument showShare={showShare} setShowShare={setShowShare} selected={selected} userId={props.userId} />
+      <RenameDocument showRename={showRename} setShowRename={setShowRename} selected={selected} setDocs={setDocs} />
+      <DeleteDocument showDelete={showDelete} setShowDelete={setShowDelete} selected={selected} setDocs={setDocs} />
+      <CreateDocument showCreate={showCreate} setShowCreate={setShowCreate} GetUserDocs={GetUserDocs} selected={selected} userId={props.userId} />
     </div>
   );
 }

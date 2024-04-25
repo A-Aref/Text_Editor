@@ -49,6 +49,14 @@ public class UsersService {
         // Check if the password matches the password stored in the database
         return password.equals(user.getPassword());
     }
+
+    public String getUserName(String email){
+         
+        Users user = usersRepository.findByEmail(email);
+        return user.getName();
+    }
+
+   
 }
     
 
