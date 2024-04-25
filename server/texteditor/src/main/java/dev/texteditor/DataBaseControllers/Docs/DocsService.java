@@ -25,6 +25,13 @@ public class DocsService {
         return docsRepository.findByDocId(id);
     }
 
+    public String getTitle(String id){
+        if(id == null)
+            return null;
+        Docs doc = docsRepository.findByDocId(id).get();
+        return doc.getTitle();
+    }
+
     public List<Docs> getAllDoc(){
         return docsRepository.findAll();
     }

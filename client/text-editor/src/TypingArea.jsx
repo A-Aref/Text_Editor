@@ -9,11 +9,15 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import RestoreIcon from '@mui/icons-material/Restore';
 
 import ReactQuill, { Quill } from "react-quill";
+import QuillCursors, { Cursor } from 'quill-cursors';
 
 import { Client } from "@stomp/stompjs";
 
 import "./TypingArea.css";
 import "quill/dist/quill.snow.css";
+
+Quill.register('modules/cursors', QuillCursors);
+const Delta = Quill.import('delta');
 
 function TypingArea(props) {
   const params = useParams();
@@ -27,6 +31,11 @@ function TypingArea(props) {
  
 
   const sendData = (content, delta, source, editor) => {
+    console.log(delta)
+    //const cursor = ref.current.getEditor().getModule('cursors')
+    //cursor.createCursor(props.userId,"hi","red");
+    //console.log(cursor.cursors())
+    
     if(client.connected) {
       client.publish({
         destination: `/app/${params.id}/chat.sendData`,
@@ -37,6 +46,12 @@ function TypingArea(props) {
 
 
   useEffect(() => {
+    fetch(`/api/v1/docs/title/${params.id}`, {
+      method: "GET",
+      headers: {"Content-Type": "application/json",},
+    })
+      .then((response) => {return response.text()})
+      .then((data) => {setTitle(data)})
     const client = new Client({
       brokerURL: "ws://localhost:8081/api",
       onConnect: () => {
@@ -44,7 +59,6 @@ function TypingArea(props) {
           setValue(JSON.parse(message.body))
         });
         client.subscribe(`/topic/public/${params.id}`, (message) => {
-          console.log(message.body);
           setValue(JSON.parse(message.body))
         });
         setStompClient(client)
@@ -102,7 +116,7 @@ function TypingArea(props) {
         theme="snow"
         value={value}
         onChange={sendData}
-        modules={{ toolbar: { container: "#my-quill-toolbar" } }}
+        modules={{cursors:true, toolbar: { container: "#my-quill-toolbar" } }}
         readOnly={props.edit}
         id="editor"
       />

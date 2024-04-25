@@ -40,6 +40,11 @@ public class DocsController {
 		  return new ResponseEntity<Optional<Docs>>(docsService.getDoc(id), HttpStatus.OK);
 	  }
 
+    @GetMapping("/title/{id}")
+    public ResponseEntity<Object> getTitle(@PathVariable String id) {
+		  return new ResponseEntity<Object>(docsService.getTitle(id), HttpStatus.OK);
+	  }
+
     @PostMapping("/data")
     public ResponseEntity<Object> getDocData(@RequestBody Map<String,Object> payload) {
       Docs d;
