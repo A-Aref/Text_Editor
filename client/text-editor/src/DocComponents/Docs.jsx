@@ -128,7 +128,6 @@ function Docs(props) {
     props.setPage('Editor')
     navigate(`/Docs/${doc.docId}`)
     props.setEdit(doc.Role === "Viewer" ? true : false)
-    props.setCurrentOpenDoc(doc.docId);
   }
 
   return (

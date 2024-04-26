@@ -9,9 +9,9 @@
   background-color: #aee1cd;
   color: rgb(0, 89, 255);
 }
+
 .edit-button:disabled {
-  background-color: black;
-  color: black;
+  pointer-events: none;
 }
 
 #my-quill-toolbar {
@@ -32,13 +32,6 @@
 #my-quill-toolbar .ql-bold:hover,
 #my-quill-toolbar .ql-italic:hover {
   background-color: #aee1cd;
-}
-#my-quill-toolbar .ql-bold:disabled,
-#my-quill-toolbar .ql-italic:disabled{
-  background-color: #0a0a0a;
-  color: #010e08;
-  text-decoration-color: #010e08;
-
 }
 
 .ql-editor,.ql-container,#editor{
@@ -61,6 +54,7 @@
  #historyButton{
   background-color: #0a0a0a;
   color: rgb(0, 89, 255);
+  min-width: 80px;
  }
  #historyButton:hover
  {

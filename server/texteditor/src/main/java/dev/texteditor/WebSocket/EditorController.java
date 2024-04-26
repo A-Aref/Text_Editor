@@ -4,7 +4,7 @@ package dev.texteditor.WebSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-//import java.util.Map;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -29,6 +29,7 @@ public class EditorController {
     @Autowired
     private DocsController docsController;
     HashMap<String, List<Object>> myMap = new HashMap<String,List<Object>>();
+    List<String> UserIds = new ArrayList<>();
 
     // HashMap<String, List<List<Character>>> myMapChar = new HashMap<String,List<List<Character>>>();
 
@@ -43,16 +44,23 @@ public class EditorController {
 
     @MessageMapping("/{id}/chat.sendData")
     @SendTo("/topic/public/{id}")
-    public Object sendData(@Payload Object data,@DestinationVariable String id){
+    public Object sendData(@Payload Map<String,Object> data,@DestinationVariable String id){
         myMap.get(id).set(1,data);
         return myMap.get(id).get(1);
     }
 
     @SuppressWarnings("null")
-    @SubscribeMapping("/sub/{id}")
-    public Object sendDataInit(@DestinationVariable String id,SimpMessageHeaderAccessor headerAccessor){
-        System.out.println(id);
+    @SubscribeMapping("/sub/{id}/{userId}")
+    public Object sendDataInit(@DestinationVariable String id,@DestinationVariable String userId,SimpMessageHeaderAccessor headerAccessor){
+
+        if(UserIds.contains(userId))
+        {
+            //Disconnect client
+            return "null";
+        }
+        UserIds.add(userId);
         headerAccessor.getSessionAttributes().put("id",id);
+        headerAccessor.getSessionAttributes().put("userId",userId);
         if(myMap.get(id) == null || (Integer)myMap.get(id).get(0)  == 0)
         {
             List<Object> l = new ArrayList<Object>();
@@ -64,18 +72,25 @@ public class EditorController {
         {
             myMap.get(id).set(0,(Integer)myMap.get(id).get(0)+1);  
         }
-        System.out.println((Integer)myMap.get(id).get(0));
         return myMap.get(id).get(1);
     }
 
 
 
     @EventListener
+    @SuppressWarnings("null")
     public void onApplicationEvent(SessionDisconnectEvent event) {
-        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
-        @SuppressWarnings("null")
+        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage()); 
         String id = (String)sha.getSessionAttributes().get("id");
-        myMap.get(id).set(0,(Integer)myMap.get(id).get(0)-1);
+        UserIds.remove(sha.getSessionAttributes().get("userId"));
+        if(myMap.get(id) != null)
+        {
+            myMap.get(id).set(0,(Integer)myMap.get(id).get(0)-1);
+            if(myMap.get(id).get(0).toString().equals("0"))
+            {
+                docsController.setDocData(id,myMap.get(id).get(1));
+            }
+        }
     }
 
     @SuppressWarnings("null")

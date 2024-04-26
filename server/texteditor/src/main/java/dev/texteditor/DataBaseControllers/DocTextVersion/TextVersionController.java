@@ -1,6 +1,5 @@
 package dev.texteditor.DataBaseControllers.DocTextVersion;
 
-import org.apache.logging.log4j.util.PropertySource.Comparator;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,10 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import dev.texteditor.DataBaseControllers.Users.UsersService;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +16,7 @@ import java.util.Optional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/api/docHistory")

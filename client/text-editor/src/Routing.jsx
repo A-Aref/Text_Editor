@@ -15,8 +15,6 @@ function Routing() {
     const [page, setPage] = useState('Login')
     const [edit, setEdit] = useState()
     const [user, setUser] = useState({})
-    const [currentOpenDoc, setcurrentOpenDoc] = useState(null);
-    const [currentText, setcurrentText] = useState(null);
 
     const setToDocs = () => setPage('Docs')
     const setUserr = (user) => setUser(user)
@@ -32,12 +30,10 @@ function Routing() {
                     <Route path='/Register' element={<Register />} />
                     <Route element={<PrivateRoute viewSet="Docs" view={page} />}>
                         <Route path='/Docs' element={<Docs setPage={setPage} setEdit={setEdit}
-                            userId={user} setCurrentOpenDoc={setcurrentOpenDoc} />} />
+                            userId={user}/>} />
                     </Route>
                     <Route element={<PrivateRoute viewSet="Editor" view={page} />}>
-                        <Route path='/Docs/:id' element={<TypingArea setPage={setPage} edit={edit}
-                            currentUserEmail={user} currentOpenDoc={currentOpenDoc}
-                            currentText={currentText} setCurrentText={setcurrentText} />} />
+                        <Route path='/Docs/:id' element={<TypingArea setPage={setPage} edit={edit} userId={user}/>} />
                     </Route>
                     <Route path='*' element={<EntryPoint setPage={setPage} setUser={setUser} />} />
                 </Routes>

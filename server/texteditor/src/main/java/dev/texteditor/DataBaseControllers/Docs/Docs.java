@@ -20,6 +20,5 @@ public class Docs {
     private String docId;
     private String desc;
     private Object data;
-    private String lastSave;
     private String Title;
 }

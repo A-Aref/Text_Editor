@@ -96,5 +96,16 @@ public class DocsController {
         return null;
       }
 	  }
+
+    public void setDocData(String id,Object Data) {
+      if(id != null)
+      {
+        docsService.setDoc(id,Data);
+      }
+      else
+      {
+        return;
+      }
+	  }
     
 }

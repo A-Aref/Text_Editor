@@ -25,6 +25,14 @@ public class DocsService {
         return docsRepository.findByDocId(id);
     }
 
+    public void setDoc(String id,Object Data){
+        if(id == null)
+            return;
+        Query query = new Query(Criteria.where("docId").is(id));
+        Update update = new Update().set("data", Data);
+        mongoTemplate.updateFirst(query, update, Docs.class);
+    }
+
     public String getTitle(String id){
         if(id == null)
             return null;
