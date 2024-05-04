@@ -26,7 +26,6 @@ const ShareDocument = (props) => {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
         setUsers(data);
       });
   };

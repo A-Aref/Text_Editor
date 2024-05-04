@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import dev.texteditor.DataBaseControllers.Docs.DocsController;
+import dev.texteditor.LSEQ.CRDT;
 
 
 @Controller
@@ -28,25 +29,21 @@ public class EditorController {
 
     @Autowired
     private DocsController docsController;
-    HashMap<String, List<Object>> myMap = new HashMap<String,List<Object>>();
+    HashMap<String, Integer> noUsers = new HashMap<String,Integer>();
+    HashMap<String, CRDT> docData = new HashMap<String,CRDT>();
     List<String> UserIds = new ArrayList<>();
 
-    // HashMap<String, List<List<Character>>> myMapChar = new HashMap<String,List<List<Character>>>();
-
-    // @MessageMapping("/{id}/chat.sendData")
-    // @SendTo("/topic/public/{id}")
-    // public Object sendDatas(@Payload Map<String,Object> map,@DestinationVariable String id){
-    //     for (Object data : map.values()) {
-    //         data.getClass();
-    //     }
-    //     return myMap.get(id).get(1);
-    // }
-
+    
+    @SuppressWarnings("unchecked")
     @MessageMapping("/{id}/chat.sendData")
     @SendTo("/topic/public/{id}")
-    public Object sendData(@Payload Map<String,Object> data,@DestinationVariable String id){
-        myMap.get(id).set(1,data);
-        return myMap.get(id).get(1);
+    public Object sendData(@Payload Map<String,Object> payload,@DestinationVariable String id){
+        if(payload.get("type").equals("insert"))
+        {
+            docData.get(id).addNode_Id(payload.get("loc").toString(),(Map<String,Object>)payload.get("data")); 
+            //System.out.println(docData.get(id).traverseTree_node());
+        }
+        return payload;
     }
 
     @SuppressWarnings("null")
@@ -61,21 +58,32 @@ public class EditorController {
         UserIds.add(userId);
         headerAccessor.getSessionAttributes().put("id",id);
         headerAccessor.getSessionAttributes().put("userId",userId);
-        if(myMap.get(id) == null || (Integer)myMap.get(id).get(0)  == 0)
+        if(noUsers.get(id) == null || noUsers.get(id) == 0)
         {
-            List<Object> l = new ArrayList<Object>();
-            l.add(1);
-            l.add(docsController.getDocDataBack(id));
-            myMap.put(id,l);
+            noUsers.put(id,1);
+            CRDT tempCrdt = new CRDT();
+            if(docsController.getDocDataBack(id)  != null)
+            {
+                @SuppressWarnings("unchecked")
+                List<Object> tempList = (List<Object>)docsController.getDocDataBack(id);
+                
+                int counter = -1;
+                for (Object item : tempList) {
+                    Map<String,Object> Mitem = new HashMap<>();
+                    Mitem.put("data",item);
+                    Mitem.put("uuid",null);
+                    tempCrdt.addNode(counter,Mitem);
+                    counter++;
+                }
+            }
+            docData.put(id,tempCrdt);
         }
         else
         {
-            myMap.get(id).set(0,(Integer)myMap.get(id).get(0)+1);  
+            noUsers.put(id,noUsers.get(id) + 1);
         }
-        return myMap.get(id).get(1);
+        return docData.get(id).traverseTree_node();
     }
-
-
 
     @EventListener
     @SuppressWarnings("null")
@@ -83,22 +91,16 @@ public class EditorController {
         StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage()); 
         String id = (String)sha.getSessionAttributes().get("id");
         UserIds.remove(sha.getSessionAttributes().get("userId"));
-        if(myMap.get(id) != null)
+        if(noUsers.get(id) != null)
         {
-            myMap.get(id).set(0,(Integer)myMap.get(id).get(0)-1);
-            if(myMap.get(id).get(0).toString().equals("0"))
-            {
-                docsController.setDocData(id,myMap.get(id).get(1));
+            
+            noUsers.put(id,noUsers.get(id) - 1);
+            if(noUsers.get(id) == 0)
+            {  
+                docsController.setDocData(id,docData.get(id).traverseTree_data());
+                docData.put(id,null);
             }
         }
-    }
-
-    @SuppressWarnings("null")
-    @MessageMapping("/chat.addUser")
-    @SendTo("/topic/public")
-    public String addUser(@Payload String data,SimpMessageHeaderAccessor headerAccessor){
-        headerAccessor.getSessionAttributes().put("user",data);
-        return data;
     }
 
 }

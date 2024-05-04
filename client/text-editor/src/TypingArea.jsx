@@ -22,6 +22,8 @@ import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import CRDT from "./LSEQ/CRDT";
+
 Quill.register("modules/cursors", QuillCursors);
 const Delta = Quill.import("delta");
 
@@ -38,24 +40,101 @@ function TypingArea(props) {
   const [disableH, setDisableH] = useState(false);
   const [selectedIndex, setselectedIndex] = useState();
   const [currentText, setCurrentText] = useState(null);
+  const [CRDTData,setCRDTData] = useState(new CRDT());
 
-  const sendData = (content, delta, source, editor) => {
-    if (delta.ops[1].insert === " ") {
-      if (client.connected) {
+  function remoteInsert(index, data) {
+    if (ref.current) {
+      ref.current.getEditor().editor
+      .insertText(
+        index,
+        data["char"],
+        {
+          italic: data["italic"],
+          bold: data["bold"],
+        },
+        "silent"
+      );
+    }
+  }
+
+  function insert(chars, startIndex, attributes, source) {
+    let index = startIndex;
+    for (let i in chars) {
+      let char = chars[i];
+      const data = {
+        char: char,
+        bold: attributes === undefined ? false : attributes["bold"],
+        italic: attributes === undefined ? false : attributes["italic"],
+      };
+      const insertedNode = CRDTData.addNode(index, { uuid: null, data: data });
+      
+      if (client.connected && source !== "silent") {
         client.publish({
           destination: `/app/${params.id}/chat.sendData`,
-          body: JSON.stringify(editor.getContents()),
+          body: JSON.stringify({
+            type: "insert",
+            loc: index === -1 ? "-1" : insertedNode[0].getUUID(),
+            data: { uuid: insertedNode[1].getUUID(), data: data },
+            userId: props.userId,
+          }),
         });
       }
+      index += 1;
     }
+  }
+
+  function inspectDelta(ops, index, source) {
+    if (ops["insert"] != null) {
+      let chars = ops["insert"];
+      let attributes = ops["attributes"];
+      insert(chars, index, attributes, source);
+    } else if (ops["delete"] != null) {
+      let len = ops["delete"];
+      delete(index, len, source);
+    } else if (ops["retain"] != null) {
+      let len = ops["retain"];
+      let attributes = ops["attributes"];
+      retain(index, len, attributes, source);
+    }
+  }
+
+  const sendData = (content, delta, source, editor) => {
+    let index = delta.ops[0]["retain"] || 0;
+    index = index - 1;
+    if (delta.ops.length === 4) {
+      const deleteOps_1 = delta.ops[1];
+      inspectDelta(deleteOps_1, index, source);
+      index += delta.ops[2]["retain"];
+      const deleteOps_2 = delta.ops[3];
+      inspectDelta(deleteOps_2, index, source);
+    } else if (delta.ops.length === 3) {
+      const deleteOps = delta.ops[2];
+      inspectDelta(deleteOps, index, source);
+      const insert = delta.ops[1];
+      inspectDelta(insert, index, source);
+    } else if (delta.ops.length === 2) {
+      inspectDelta(delta.ops[1], index, source);
+    } else {
+      inspectDelta(delta.ops[0], index, source);
+    }
+    setValue(content);
   };
+
+  // if (client.connected && source !== 'silent') {
+  //   client.publish({
+  //     destination: `/app/${params.id}/chat.sendData`,
+  //     body: JSON.stringify(editor.getContents()),
+  //   });
+  // }
 
   const switchToHistory = () => {
     setopenSideHistory(!openSideHistory);
     setOpac(opac === 1 ? 0 : 1);
     if (client.connected) {
+      setCRDTData(null);
       client.deactivate();
     } else {
+      setCRDTData(new CRDT());
       client.activate();
     }
   };
@@ -76,20 +155,30 @@ function TypingArea(props) {
       brokerURL: "ws://localhost:8081/api",
       onConnect: () => {
         client.subscribe(`/app/sub/${params.id}/${props.userId}`, (message) => {
-          if (JSON.parse(message.body) !== null)
-            setValue(JSON.parse(message.body));
-          else {
+          if (JSON.parse(message.body) !== null) {
+            let arr = JSON.parse(message.body);
+            for (let i in arr) {
+              CRDTData.addNode(i-1, {uuid: arr[i].uuid,data:arr[i].data});
+              remoteInsert(i, arr[i].data);
+            }
+          } else {
             client.deactivate();
             toast.error("Document open on another device using same account");
             handleBack();
           }
         });
-        client.subscribe(
-          `/topic/public/${params.id}`,
-          (message) => {
-            setValue(JSON.parse(message.body));
+        client.subscribe(`/topic/public/${params.id}`, (message) => {
+          const info = JSON.parse(message.body);
+          if (info["userId"] === props.userId) return;
+          if (info["type"] === "insert") {
+            const tempNode = CRDTData.addNode_Id(info["loc"], info["data"]);
+            
+            remoteInsert(
+              info["loc"] === "-1" ? 0 : CRDTData.getInsertIndex_Id(tempNode[0].getUUID()),
+              info["data"]["data"]
+            );
           }
-        );
+        });
         setStompClient(client);
       },
     });
@@ -131,12 +220,14 @@ function TypingArea(props) {
     window.location.reload();
     setCurrentText(history[0]);
   };
+
   const handleSave = () => {
     // Handle the save functionality
     const dataToSave = {
       currentUserEmail: props.userId,
       docId: params.id,
       text: value,
+      value: CRDTData.traverseTree(),
     };
     fetch("/api/docHistory/saveDoc", {
       method: "POST",
@@ -171,7 +262,7 @@ function TypingArea(props) {
         <IconButton style={{ color: "white" }} onClick={handleBack}>
           <ArrowBackIcon fontSize="large" />
         </IconButton>
-        <ToastContainer />
+        <ToastContainer theme="dark" />
         {!props.edit ? (
           <div className="rounded" style={{ display: "flex", opacity: opac }}>
             <div style={{ display: "flex" }} id="my-quill-toolbar">
