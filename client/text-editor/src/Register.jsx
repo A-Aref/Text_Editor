@@ -18,18 +18,22 @@ function Register(props) {
 
   async function Registerbutt() {
     if (!/^[a-zA-Z]+$/.test(name.trim())) {
-      setErrorText("Please enter a valid name.");
+      setErrorText("Please enter a valid name (only alphabets).");
       return;
     }
     if (!email.trim()) {
       setErrorText("Email is missing.");
       return;
     }
-    if (!pass.trim()) {
-      setErrorText("Password is missing.");
+    if (!/\S+@\S+\.\S+/.test(email.trim())) {
+      setErrorText("Please enter a valid email address.");
       return;
     }
-    
+    if (pass.trim().length < 8) {
+      setErrorText("Password must be at least 8 characters long.");
+      return;
+    }
+
     try {
       const response = await fetch('/api/v1/users/register', {
         method: 'POST',
@@ -45,17 +49,21 @@ function Register(props) {
       } else {
         // Registration failed, handle error response
         const data = await response.json();
-        setErrorText(data.message || 'Registration failed.');
+        if (response.status === 409) {
+          setErrorText("This email is already registered. Please use a different email.");
+        } else {
+          setErrorText(data.message || 'Registration failed.');
+        }
       }
     } catch (error) {
       console.error('Error registering:', error);
-      setErrorText('msh fahem.');
+      setErrorText('Registration failed due to an unexpected error.');
     }
   }
 
   return (
     <div id="RegisterPage" data-bs-theme="dark" className="md">
-      <p>{errorText}</p>
+      <p className="error">{errorText}</p>
       <fieldset id="register">
         <h1>Register</h1>
         <br />

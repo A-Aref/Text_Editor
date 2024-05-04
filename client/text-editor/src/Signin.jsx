@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import Form from "react-bootstrap/Form";
@@ -9,8 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-
-import "./Signin.css"
+import "./Signin.css";
 
 function Signin(props) {
   const navigate = useNavigate();
@@ -25,12 +23,7 @@ function Signin(props) {
 
   function Submit() {
     if (email === "" || password === "") {
-      if (email === "") {
-        setErrorText("Enter the email");
-      }
-      if (password === "") {
-        setErrorText("Enter the password");
-      }
+      setErrorText("Please enter both email and password.");
     } else {
       fetch("/api/v1/users/login", {
         method: "POST",
@@ -38,30 +31,28 @@ function Signin(props) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email: email, password: password }),
-      }).catch((error) => console.log(error))
+      })
         .then((response) => {
-          const status = response.status;
-          if (status === 200) {
+          if (response.ok) {
+            props.setPage("Docs");
+            navigate("/Docs");
+            localStorage.setItem("page", "Docs");
+            props.setUser(email);
+            localStorage.setItem("user", email);
+          } else if (response.status === 400) {
+            setErrorText("Invalid email format. Please enter a valid email address.");
+          } else if (response.status === 401) {
+            setErrorText("Incorrect email or password. Please try again.");
+          } else if (response.status === 404) {
+            setErrorText("User not found. Please check your email or register.");
           } else {
-            console.log(response.statusText)
-          }
-          return response
-        })
-        .then((data) => {
-          if(data.status !== 200)
-          {
-            console.log(data)
-          }
-          else
-          {
-          props.setPage("Docs");
-          navigate("/Docs");
-          localStorage.setItem("page", "Docs");
-
-          props.setUser(email);
-          localStorage.setItem("user", email);
+            setErrorText("An unexpected error occurred. Please try again later.");
           }
         })
+        .catch((error) => {
+          console.error("Error logging in:", error);
+          setErrorText("Network error. Please check your internet connection and try again.");
+        });
     }
   }
 
