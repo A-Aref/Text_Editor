@@ -57,7 +57,7 @@ class Node {
     }
 
     getChildren() {
-        return Array.from(this.childrenPos);
+        return Array.from(this.childrenPos).sort(function(a, b){return a-b});
     }
 }
 

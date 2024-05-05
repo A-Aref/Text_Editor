@@ -44,10 +44,10 @@ class CRDT {
             }
             switch (flag) {
                 case 1:
-                    this.addNode(current.getChild(pos), Q, data);
+                    this._addNode(current.getChild(pos), Q, data);
                     break;
                 case -1:
-                    this.addNode(P, current.getChild(pos), data);
+                    this._addNode(P, current.getChild(pos), data);
                     break;
                 case 0:
                     break;

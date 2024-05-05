@@ -49,7 +49,6 @@ public ResponseEntity<Object> CreateDocument(@RequestBody Map<String,Object> Par
   Docs newDoc = new Docs();
   newDoc.setDesc((String)Parameters.get("docDesc"));
   newDoc.setTitle((String)Parameters.get("docTitle"));
-  newDoc.setData("");
   ObjectId generatedId = new ObjectId();
   newDoc.setId(generatedId);
   newDoc.setDocId(generatedId.toString());
