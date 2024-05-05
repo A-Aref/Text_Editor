@@ -17,6 +17,7 @@
     "@mui/material": "^5.15.11",
     "@stomp/stompjs": "^7.0.0",
     "bootstrap": "^5.3.3",
+    "crypto-js": "^4.2.0",
     "net": "^1.0.2",
     "quill-cursors": "^4.0.2",
     "react": "^18.2.0",

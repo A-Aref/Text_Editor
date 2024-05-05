@@ -7,10 +7,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import IconButton from "@mui/material/IconButton";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Register(props) {
   const navigate = useNavigate();
-  const [errorText, setErrorText] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
@@ -18,19 +19,19 @@ function Register(props) {
 
   async function Registerbutt() {
     if (!/^[a-zA-Z]+$/.test(name.trim())) {
-      setErrorText("Please enter a valid name (only alphabets).");
+      toast.error("Please enter a valid name (only alphabets).");
       return;
     }
     if (!email.trim()) {
-      setErrorText("Email is missing.");
+      toast.error("Email is missing.");
       return;
     }
     if (!/\S+@\S+\.\S+/.test(email.trim())) {
-      setErrorText("Please enter a valid email address.");
+      toast.error("Please enter a valid email address.");
       return;
     }
     if (pass.trim().length < 8) {
-      setErrorText("Password must be at least 8 characters long.");
+      toast.error("Password must be at least 8 characters long.");
       return;
     }
 
@@ -42,29 +43,25 @@ function Register(props) {
         },
         body: JSON.stringify({ name:name, email:email, pass:pass }),
       });
-
+      const responseData = await response.text();
       if (response.ok) {
         // Registration successful, redirect to login page
-        navigate('/Login');
+        if (responseData.includes('registered successfully')) { navigate('/Login'); } // User registered successfully
+        else if (responseData.includes('already exists'))     { toast.error('User with this email already exists.'); } 
       } else {
         // Registration failed, handle error response
-        const data = await response.json();
-        if (response.status === 409) {
-          setErrorText("This email is already registered. Please use a different email.");
-        } else {
-          setErrorText(data.message || 'Registration failed.');
-        }
+        toast.error(responseData.message || 'Registration failed.');
       }
     } catch (error) {
       console.error('Error registering:', error);
-      setErrorText('Registration failed due to an unexpected error.');
+      toast.error('Registration failed due to an unexpected error.');
     }
   }
 
   return (
     <div id="RegisterPage" data-bs-theme="dark" className="md">
-      <p className="error">{errorText}</p>
       <fieldset id="register">
+        <ToastContainer theme='dark'/>
         <h1>Register</h1>
         <br />
         <div id="register_fields">

@@ -9,13 +9,15 @@ import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import "./Signin.css";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import CryptoJS from 'crypto-js';
 
 function Signin(props) {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(true);
   const [email, setEmail] = useState("");
-  const [errorText, setErrorText] = useState("");
 
   useEffect(() => {
     props.setPage("Login");
@@ -23,14 +25,20 @@ function Signin(props) {
 
   function Submit() {
     if (email === "" || password === "") {
-      setErrorText("Please enter both email and password.");
+      toast.error("Please enter both email and password.");
     } else {
+      console.log(password);
+      const keyBase64 = "o9szYIOq1rRMiouNhNvaq96lqUvCekxR";   // ay habal bas el backend lazm nfs el 7aga
+      var key = CryptoJS.enc.Base64.parse(keyBase64);
+      var srcs = CryptoJS.enc.Utf8.parse(password);
+      const encryptedPassword = CryptoJS.AES.encrypt(srcs, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7}).toString();
+      console.log(encryptedPassword);
       fetch("/api/v1/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: email, password: password }),
+        body: JSON.stringify({ email: email, password: encryptedPassword }),
       })
         .then((response) => {
           if (response.ok) {
@@ -40,26 +48,26 @@ function Signin(props) {
             props.setUser(email);
             localStorage.setItem("user", email);
           } else if (response.status === 400) {
-            setErrorText("Invalid email format. Please enter a valid email address.");
+            toast.error("Invalid email format. Please enter a valid email address.");
           } else if (response.status === 401) {
-            setErrorText("Incorrect email or password. Please try again.");
+            toast.error("Incorrect email or password. Please try again.");
           } else if (response.status === 404) {
-            setErrorText("User not found. Please check your email or register.");
+            toast.error("User not found. Please check your email or register.");
           } else {
-            setErrorText("An unexpected error occurred. Please try again later.");
+            toast.error("An unexpected error occurred. Please try again later.");
           }
         })
         .catch((error) => {
           console.error("Error logging in:", error);
-          setErrorText("Network error. Please check your internet connection and try again.");
+          toast.error("Network error. Please check your internet connection and try again.");
         });
     }
   }
 
   return (
     <div id="SigninPage" data-bs-theme="dark" className="md">
-      <p id="errorText">{errorText}</p>
       <fieldset id="login" className="md">
+        <ToastContainer theme='dark'/>
         <h1>Sign in</h1>
         <br />
         <FloatingLabel controlId="floatingInput" label="Email" className="mb-3">
