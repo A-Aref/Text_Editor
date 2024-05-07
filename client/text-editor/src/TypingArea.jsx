@@ -9,12 +9,12 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import RestoreIcon from "@mui/icons-material/Restore";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import Button from "react-bootstrap/Button";
-import Collapse from 'react-bootstrap/Collapse';
+import Collapse from "react-bootstrap/Collapse";
 import ReactQuill, { Quill } from "react-quill";
 import QuillCursors, { Cursor } from "quill-cursors";
 
 import { Client } from "@stomp/stompjs";
-import Card from 'react-bootstrap/Card';
+import Card from "react-bootstrap/Card";
 import "./TypingArea.css";
 import "quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
@@ -86,12 +86,22 @@ function TypingArea(props) {
         client.subscribe(`/topic/public/${params.id}`, (message) => {
           const info = JSON.parse(message.body);
           if (info["userId"] === props.userId) return;
+          
           if (info["type"] === "insert") {
             const tempNode = CRDTData.addNode_Id(info["loc"], info["data"]);
-
             remoteInsert(
-              info["loc"] === "-1" ? 0 : CRDTData.getInsertIndex_Id(tempNode[0].getUUID()),
+              info["loc"] === "-1"
+                ? 0
+                : CRDTData.getInsertIndex_Id(tempNode[0].getUUID()),
               info["data"]["data"]
+            );
+          }
+          if (info["type"] === "delete") {
+            const deletedNode = CRDTData.deleteNode_Id(info["loc"])
+            remoteDelete(
+              info["loc"] === "-1"
+                ? 0
+                : CRDTData.getInsertIndex_Id(deletedNode.getUUID()),
             );
           }
         });
@@ -101,19 +111,23 @@ function TypingArea(props) {
     client.activate();
   }, []);
 
-
   function remoteInsert(index, data) {
     if (ref.current) {
-      ref.current.getEditor().editor
-        .insertText(
-          index,
-          data["char"],
-          {
-            italic: data["italic"],
-            bold: data["bold"],
-          },
-          "silent"
-        );
+      ref.current.getEditor().editor.insertText(
+        index,
+        data["char"],
+        {
+          italic: data["italic"],
+          bold: data["bold"],
+        },
+        "silent"
+      );
+    }
+  }
+
+  function remoteDelete(index) {
+    if (ref.current) {
+      ref.current.getEditor().editor.deleteText(index, 1, "silent");
     }
   }
 
@@ -143,6 +157,27 @@ function TypingArea(props) {
     }
   }
 
+  function delete_local(startIndex, length, source) {
+    let index = startIndex;
+    for (let i = 0; i < length; i++) {
+      try {
+        const deletedNode = CRDTData.deleteNode(index+1);
+        if (client.connected && source !== "silent") {
+          client.publish({
+            destination: `/app/${params.id}/chat.sendData`,
+            body: JSON.stringify({
+              type: "delete",
+              loc: deletedNode.getUUID(),
+              userId: props.userId,
+            }),
+          });
+        }
+      } catch {
+        alert("failed to find relative index");
+      }
+    }
+  }
+
   function inspectDelta(ops, index, source) {
     if (ops["insert"] != null) {
       let chars = ops["insert"];
@@ -150,7 +185,7 @@ function TypingArea(props) {
       insert(chars, index, attributes, source);
     } else if (ops["delete"] != null) {
       let len = ops["delete"];
-      delete (index, len, source);
+      delete_local (index, len, source);
     } else if (ops["retain"] != null) {
       let len = ops["retain"];
       let attributes = ops["attributes"];
@@ -159,23 +194,25 @@ function TypingArea(props) {
   }
 
   const sendData = (content, delta, source, editor) => {
-    let index = delta.ops[0]["retain"] || 0;
-    index = index - 1;
-    if (delta.ops.length === 4) {
-      const deleteOps_1 = delta.ops[1];
-      inspectDelta(deleteOps_1, index, source);
-      index += delta.ops[2]["retain"];
-      const deleteOps_2 = delta.ops[3];
-      inspectDelta(deleteOps_2, index, source);
-    } else if (delta.ops.length === 3) {
-      const deleteOps = delta.ops[2];
-      inspectDelta(deleteOps, index, source);
-      const insert = delta.ops[1];
-      inspectDelta(insert, index, source);
-    } else if (delta.ops.length === 2) {
-      inspectDelta(delta.ops[1], index, source);
-    } else {
-      inspectDelta(delta.ops[0], index, source);
+    if (!openSideHistory) {
+      let index = delta.ops[0]["retain"] || 0;
+      index = index - 1;
+      if (delta.ops.length === 4) {
+        const deleteOps_1 = delta.ops[1];
+        inspectDelta(deleteOps_1, index, source);
+        index += delta.ops[2]["retain"];
+        const deleteOps_2 = delta.ops[3];
+        inspectDelta(deleteOps_2, index, source);
+      } else if (delta.ops.length === 3) {
+        const deleteOps = delta.ops[2];
+        inspectDelta(deleteOps, index, source);
+        const insert = delta.ops[1];
+        inspectDelta(insert, index, source);
+      } else if (delta.ops.length === 2) {
+        inspectDelta(delta.ops[1], index, source);
+      } else {
+        inspectDelta(delta.ops[0], index, source);
+      }
     }
     setValue(content);
   };
@@ -194,13 +231,11 @@ function TypingArea(props) {
       setCRDTData(null);
       client.deactivate();
     } else {
+      ref.current.getEditor().setContents(new Delta().insert("\n"));
       setCRDTData(new CRDT());
       client.activate();
     }
   };
-
-
-
 
   async function getDocsHistory() {
     setLoading(true);
@@ -229,11 +264,16 @@ function TypingArea(props) {
 
   const handleSave = () => {
     // Handle the save functionality
+    if(value === null) 
+      {
+        toast.error("No new changes have ocuured");
+        return
+      }
     const dataToSave = {
       currentUserEmail: props.userId,
       docId: params.id,
       text: value,
-      value: CRDTData.traverseTree(),
+      text_Object: CRDTData.traverseTree(),
     };
     fetch("/api/docHistory/saveDoc", {
       method: "POST",
@@ -294,18 +334,26 @@ function TypingArea(props) {
         ) : (
           <div id="my-quill-toolbar"></div>
         )}
-        <button
-          className=" edit-button"
-          onClick={switchToHistory}
-          disabled={disableH}
-          aria-controls="example-collapse-text"
-          aria-expanded={openSideHistory}
-        >
-          {Loading && <div className="spinner-border text-secondary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>}
-          {!Loading && <RestoreIcon className="saveIcon" sx={{ fontSize: 44 }} />}
-        </button>
+        {!props.edit ? (
+          <button
+            className=" edit-button"
+            onClick={switchToHistory}
+            disabled={disableH}
+            aria-controls="example-collapse-text"
+            aria-expanded={openSideHistory}
+          >
+            {Loading && (
+              <div className="spinner-border text-secondary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            )}
+            {!Loading && (
+              <RestoreIcon className="saveIcon" sx={{ fontSize: 44 }} />
+            )}
+          </button>
+        ) : (
+          <></>
+        )}
         <h2 style={{ marginRight: "3rem" }}>
           <i>{title}</i>
         </h2>
@@ -325,7 +373,11 @@ function TypingArea(props) {
           id="editor"
         />
         <Collapse in={openSideHistory} dimension="width">
-          <Card className="overflow-y-scroll " style={{ width: '170px' }} id="example-collapse-text">
+          <Card
+            className="overflow-y-scroll "
+            style={{ width: "170px" }}
+            id="example-collapse-text"
+          >
             {history.map((history, index) => {
               return (
                 <button
@@ -336,9 +388,10 @@ function TypingArea(props) {
                   id="historyButton"
                   key={index}
                   className={`text-white flex-column d-flex min-w-max
-                  justify-content-center ${selectedIndex === index ? "bg-primary" : ""
-                    } `}
-                  style={{ width: '200px' }}
+                  justify-content-center ${
+                    selectedIndex === index ? "bg-primary" : ""
+                  } `}
+                  style={{ width: "200px" }}
                 >
                   <p id="historyText" className="fs-5">
                     {history.version}
@@ -356,20 +409,22 @@ function TypingArea(props) {
                     </p>
                   </div>
                   {/* <Button variant="danger" >Restore</Button> */}
-                  <p id="setCurrent"
+                  <p
+                    id="setCurrent"
                     onClick={() => {
                       setopenSideHistory(false);
                       setCurrentText(history.text);
-                    }}>
-                    Set current</p>
+                    }}
+                  >
+                    Set current
+                  </p>
                 </button>
-
               );
             })}
           </Card>
         </Collapse>
       </div>
-    </div >
+    </div>
   );
 }
 

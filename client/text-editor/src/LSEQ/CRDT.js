@@ -158,7 +158,7 @@ class CRDT {
 
     searchTree_Id(NodeS, id, map, S) {
         for (const child of NodeS.getChildren()) {
-            if (NodeS.getChild(child).getData() !== null && !NodeS.getChild(child).getDeleted()) {
+            if (NodeS.getChild(child).getData() !== null) {
                 if (!map.flag) {
                     S[1] = NodeS.getChild(child);
                     return;
@@ -167,7 +167,10 @@ class CRDT {
                     S[0] = NodeS.getChild(child);
                     map.flag = false;
                 }
-                map.counter++
+                if(!NodeS.getChild(child).getDeleted())
+                {
+                    map.counter++;
+                }
             }
             this.searchTree_Id(NodeS.getChild(child), id, map, S);
         }
@@ -175,7 +178,7 @@ class CRDT {
 
     searchTree(NodeS, index, map, S) {
         for (const child of NodeS.getChildren()) {
-            if (NodeS.getChild(child).getData() !== null && !NodeS.getChild(child).getDeleted()) {
+            if (NodeS.getChild(child).getData() !== null) {
                 if (!map.flag) {
                     S[1] = NodeS.getChild(child);
                     return;
@@ -184,7 +187,10 @@ class CRDT {
                     S[0] = NodeS.getChild(child);
                     map.flag = false;
                 }
-                map.counter++;
+                if(!NodeS.getChild(child).getDeleted())
+                {
+                    map.counter++;
+                }
             }
             this.searchTree(NodeS.getChild(child), index, map, S);
         }
@@ -195,6 +201,7 @@ class CRDT {
         const test = { flag: true, counter: 0 };
         if (index === -1) {
             this.searchTree(this.Start, 0, test, S);
+            
             if (S[1] !== this.End || S[0] !== this.Begin) {
                 S[1] = S[0];
                 S[0] = this.Begin;
@@ -235,9 +242,11 @@ class CRDT {
     }
 
     deleteNode(index) {
-        const S = this.getRelativeIndex(index);
-        this._deleteNode(S[0]);
-        return S[0];
+        const Nodes = [];
+        this._traverseTree(this.Start, Nodes);
+        const S = Nodes[index]
+        this._deleteNode(S);
+        return S;
     }
 
     deleteNode_Id(id) {
@@ -267,7 +276,6 @@ class CRDT {
             {
                 S[1] = S[0];
                 S[0] = this.Begin;
-                console.log("hi")
             }
         } else {
             this.searchTree_Id(this.Start, id, test, S);

@@ -34,6 +34,8 @@
   background-color: #aee1cd;
 }
 
+.ql-container.ql-snow{ border: none !important;}
+
 .ql-editor,.ql-container,#editor{
   background-color: #1a1a1a;
   margin-left: 10px;
