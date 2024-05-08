@@ -106,9 +106,8 @@ function TypingArea(props) {
           }
           if (info["type"] === "retain") {
             const tempNode = CRDTData.update_Id(info["loc"], info["data"]);
-            console.log(CRDTData.getInsertIndex_Id(tempNode.getUUID()))
             remoteRetain(
-              info["loc"] === "-1" ? 0 : CRDTData.getInsertIndex_Id(tempNode.getUUID()),
+              info["loc"] === "-1" ? -1 : CRDTData.getInsertIndex_Id(tempNode.getUUID()),
               info["data"]
             );
           }
@@ -140,14 +139,12 @@ function TypingArea(props) {
   }
 
   function remoteRetain(index, data) {
-    console.log(CRDTData.traverseTree())
-    console.log(index)
     if (ref.current) {
       console.log(data['bold'])
       console.log(data['italic'])
       ref.current.getEditor().editor
       .formatText(
-        index - 1,
+        (index <= 0) ? 0 : index - 1,
         1,
         {
           'italic': data["italic"] === undefined ? false : data["italic"],
@@ -212,6 +209,7 @@ function TypingArea(props) {
         let loc = CRDTData.update(index + i + 1, attributes);
         /* set in backend */
         if (client.connected && source !== "silent") {
+          console.log(index)
           client.publish({
             destination: `/app/${params.id}/chat.sendData`,
             body: JSON.stringify({
@@ -223,7 +221,7 @@ function TypingArea(props) {
           });
         }
       }
-      catch { alert("failed to find relative index"); }
+      catch { toast.error("failed to find relative index"); }
     }
   }
 
@@ -260,7 +258,12 @@ function TypingArea(props) {
       } else if (delta.ops.length === 2) {
         inspectDelta(delta.ops[1], index, source);
       } else {
-        inspectDelta(delta.ops[0], index, source);
+        if (delta.ops[0]["retain"] === undefined) {
+          inspectDelta(delta.ops[0], index, source);
+        } else {
+          inspectDelta(delta.ops[0], -1, source);
+        }
+        
       }
     }
     setValue(content);
@@ -280,7 +283,7 @@ function TypingArea(props) {
       setCRDTData(null);
       client.deactivate();
     } else {
-      ref.current.getEditor().setContents(new Delta().insert("\n"));
+      ref.current.getEditor().editor.setContents(new Delta().insert("\n"));
       setCRDTData(new CRDT());
       client.activate();
     }
