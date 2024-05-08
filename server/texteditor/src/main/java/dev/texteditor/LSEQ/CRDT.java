@@ -288,7 +288,7 @@ public class CRDT {
         return S[0];
     }
 
-    public Node update(int index,Map<String,Object> data) {
+    public Node update(int index, Map<String,Object> data) {
         Node[] S = getRelativeIndex(index);
         S[0].setData(data);
         return S[0];

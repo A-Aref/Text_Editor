@@ -57,6 +57,25 @@ function TypingArea(props) {
     }
   }
 
+  function remoteRetain(index, data) {
+    console.log(CRDTData.traverseTree())
+    console.log(index)
+    if (ref.current) {
+      console.log(data['bold'])
+      console.log(data['italic'])
+      ref.current.getEditor().editor
+      .formatText(
+        index - 1,
+        1,
+        {
+          'italic': data["italic"] === undefined ? false : data["italic"],
+          'bold': data["bold"] === undefined ? false : data["bold"],
+        },
+        'silent'
+      );
+    } 
+  }
+
   function insert(chars, startIndex, attributes, source) {
     let index = startIndex;
     for (let i in chars) {
@@ -83,6 +102,28 @@ function TypingArea(props) {
     }
   }
 
+  function retain(index, len, attributes, source) {
+    for (let i = 0; i < len; i++) {
+      try {
+        /* set in frontend */
+        let loc = CRDTData.update(index + i + 1, attributes);
+        /* set in backend */
+        if (client.connected && source !== "silent") {
+          client.publish({
+            destination: `/app/${params.id}/chat.sendData`,
+            body: JSON.stringify({
+              type: "retain",
+              loc: index === -1 ? "-1" : loc.getUUID(),
+              data: loc.getData(),
+              userId: props.userId,
+            }),
+          });
+        }
+      }
+      catch { alert("failed to find relative index"); }
+    }
+  }
+
   function inspectDelta(ops, index, source) {
     if (ops["insert"] != null) {
       let chars = ops["insert"];
@@ -99,6 +140,7 @@ function TypingArea(props) {
   }
 
   const sendData = (content, delta, source, editor) => {
+    //console.log(delta)
     let index = delta.ops[0]["retain"] || 0;
     index = index - 1;
     if (delta.ops.length === 4) {
@@ -176,6 +218,14 @@ function TypingArea(props) {
             remoteInsert(
               info["loc"] === "-1" ? 0 : CRDTData.getInsertIndex_Id(tempNode[0].getUUID()),
               info["data"]["data"]
+            );
+          }
+          if (info["type"] === "retain") {
+            const tempNode = CRDTData.update_Id(info["loc"], info["data"]);
+            console.log(CRDTData.getInsertIndex_Id(tempNode.getUUID()))
+            remoteRetain(
+              info["loc"] === "-1" ? 0 : CRDTData.getInsertIndex_Id(tempNode.getUUID()),
+              info["data"]
             );
           }
         });

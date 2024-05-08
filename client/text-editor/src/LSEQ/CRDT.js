@@ -248,7 +248,13 @@ class CRDT {
 
     update(index, data) {
         const S = this.getRelativeIndex(index);
-        S[0].setData(data);
+        const d = S[0].getData();
+        const data2 = {
+            char: d.char,
+            bold: data["bold"] === undefined ? d.bold : data["bold"],
+            italic: data["italic"] === undefined ? d.italic : data["italic"],
+        };
+        S[0].setData(data2);
         return S[0];
     }
 

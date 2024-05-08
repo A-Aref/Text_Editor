@@ -7,7 +7,6 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 public class Node {
-
     //{"Char": " " , "bold": false , "itlaic": false } 
     private Map<String,Object> Data;
     private Node[] Children;
