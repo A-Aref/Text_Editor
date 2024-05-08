@@ -41,7 +41,10 @@ public class EditorController {
         if(payload.get("type").equals("insert"))
         {
             docData.get(id).addNode_Id(payload.get("loc").toString(),(Map<String,Object>)payload.get("data")); 
-            //System.out.println(docData.get(id).traverseTree_node());
+        }
+        if(payload.get("type").equals("delete"))
+        {
+            docData.get(id).deleteNode_Id(payload.get("loc").toString());
         }
         if (payload.get("type").equals("retain")) {
             docData.get(id).update_Id(payload.get("loc").toString(),(Map<String,Object>)payload.get("data"));

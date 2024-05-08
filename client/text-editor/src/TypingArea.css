@@ -34,6 +34,8 @@
   background-color: #aee1cd;
 }
 
+.ql-container.ql-snow{ border: none !important;}
+
 .ql-editor,.ql-container,#editor{
   background-color: #1a1a1a;
   margin-left: 10px;
@@ -43,14 +45,24 @@
   font-size: 18px;
   font-family: "Courier New", monospace;
   flex-grow: 1;
+  width: 98%;
+  min-width: 20%;
 }
 
- div#sideHistory{
+#example-collapse-text{
   background-color: #717272;
   font-family: "Courier New", monospace;
-  height: 80vh;
+  height: 80vh; 
+  min-width: 240px;
  }
- 
+ @media (max-width: 768px) {
+  #example-collapse-text {
+    min-width: 180px;
+  }
+  #historyButton{
+    max-width: 160px;
+   }
+}
  #historyButton{
   background-color: #0a0a0a;
   color: rgb(0, 89, 255);
@@ -64,4 +76,18 @@
  
  .blue-background {
   background-color: blue;
+}
+
+#setCurrent
+{
+  background-color: #3d3a3a;
+  border-radius: 5px;
+   width: 120px;
+  height: 24px;
+  color: aliceblue;
+}
+#setCurrent:hover
+{
+  background-color: #aee1cd;
+  color: rgb(0, 89, 255);
 }

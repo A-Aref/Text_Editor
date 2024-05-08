@@ -31,12 +31,12 @@ public class TextVersionController {
 
     @PostMapping("/saveDoc")
     public ResponseEntity<Object> saveDocument(@RequestBody Map<String, Object> parameters) {
-
             DocTextVersion savedDoc = new DocTextVersion(
                     new ObjectId(),
                     (String) parameters.get("docId"),
                     (String) parameters.get("currentUserEmail"),
                    (Object) parameters.get("text") ,
+                   (Object) parameters.get("text_Object") ,
                     new Date()   
             );
             // Save the document

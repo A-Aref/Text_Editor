@@ -177,7 +177,7 @@ public class CRDT {
 
     private void searchTree_Id(Node NodeS,String id,Map<String,Object> map,Node[] S) {
         for (Integer child : NodeS.getChildren()) {
-            if(NodeS.getChild(child).getData() != null && !NodeS.getChild(child).getDeleted())
+            if(NodeS.getChild(child).getData() != null)
             {
                 if(!(Boolean)map.get("flag")) {
                     S[1] = NodeS.getChild(child);
@@ -195,7 +195,7 @@ public class CRDT {
     
     private void searchTree(Node NodeS,int index,Map<String,Object> map,Node[] S) {
         for (Integer child : NodeS.getChildren()) {
-            if(NodeS.getChild(child).getData() != null && !NodeS.getChild(child).getDeleted())
+            if(NodeS.getChild(child).getData() != null )
             {
                 if(!(Boolean)map.get("flag")) {
                     S[1] = NodeS.getChild(child);
@@ -206,7 +206,11 @@ public class CRDT {
                     S[0] = NodeS.getChild(child);
                     map.put("flag",false);
                 }
+                if(!NodeS.getChild(child).getDeleted())
+                {
                 map.put("counter", (Integer)map.get("counter")+1);
+                }
+                //System.out.println(NodeS.getChild(child).getData());
             }
             searchTree(NodeS.getChild(child),index,map,S);
         }
