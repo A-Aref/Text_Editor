@@ -104,6 +104,14 @@ function TypingArea(props) {
                 : CRDTData.getInsertIndex_Id(deletedNode.getUUID()),
             );
           }
+          if (info["type"] === "retain") {
+            const tempNode = CRDTData.update_Id(info["loc"], info["data"]);
+            console.log(CRDTData.getInsertIndex_Id(tempNode.getUUID()))
+            remoteRetain(
+              info["loc"] === "-1" ? 0 : CRDTData.getInsertIndex_Id(tempNode.getUUID()),
+              info["data"]
+            );
+          }
         });
         setStompClient(client);
       },
@@ -277,60 +285,6 @@ function TypingArea(props) {
       client.activate();
     }
   };
-
-  useEffect(() => {
-    getDocsHistory();
-    fetch(`/api/v1/docs/title/${params.id}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => {
-        return response.text();
-      })
-      .then((data) => {
-        setTitle(data);
-      });
-    const client = new Client({
-      brokerURL: "ws://localhost:8081/api",
-      onConnect: () => {
-        client.subscribe(`/app/sub/${params.id}/${props.userId}`, (message) => {
-          if (JSON.parse(message.body) !== null) {
-            let arr = JSON.parse(message.body);
-            for (let i in arr) {
-              CRDTData.addNode(i-1, {uuid: arr[i].uuid,data:arr[i].data});
-              remoteInsert(i, arr[i].data);
-            }
-          } else {
-            client.deactivate();
-            toast.error("Document open on another device using same account");
-            handleBack();
-          }
-        });
-        client.subscribe(`/topic/public/${params.id}`, (message) => {
-          const info = JSON.parse(message.body);
-          if (info["userId"] === props.userId) return;
-          if (info["type"] === "insert") {
-            const tempNode = CRDTData.addNode_Id(info["loc"], info["data"]);
-            
-            remoteInsert(
-              info["loc"] === "-1" ? 0 : CRDTData.getInsertIndex_Id(tempNode[0].getUUID()),
-              info["data"]["data"]
-            );
-          }
-          if (info["type"] === "retain") {
-            const tempNode = CRDTData.update_Id(info["loc"], info["data"]);
-            console.log(CRDTData.getInsertIndex_Id(tempNode.getUUID()))
-            remoteRetain(
-              info["loc"] === "-1" ? 0 : CRDTData.getInsertIndex_Id(tempNode.getUUID()),
-              info["data"]
-            );
-          }
-        });
-        setStompClient(client);
-      },
-    });
-    client.activate();
-  }, []);
 
   useEffect(() => {
     //Exchange displayed text in case of close history
