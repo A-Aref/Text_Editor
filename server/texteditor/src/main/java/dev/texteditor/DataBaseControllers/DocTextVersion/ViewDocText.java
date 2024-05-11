@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ViewDocText {
     
+    private String id;
     private String editor;
     private Object text;
     private String version;

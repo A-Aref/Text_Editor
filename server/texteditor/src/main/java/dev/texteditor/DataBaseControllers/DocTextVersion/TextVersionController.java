@@ -29,6 +29,7 @@ public class TextVersionController {
     @Autowired
     private UsersService usersService;
 
+
     @PostMapping("/saveDoc")
     public ResponseEntity<Object> saveDocument(@RequestBody Map<String, Object> parameters) {
             DocTextVersion savedDoc = new DocTextVersion(
@@ -78,12 +79,13 @@ public class TextVersionController {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd HH:mm");
                     // Format the LocalDateTime object into the desired format
                     String formattedDateTime = localDateTime.format(formatter);
-                    ViewDocText version = new ViewDocText(userName,doc.getText(), formattedDateTime);
+                    ViewDocText version = new ViewDocText(doc.getId().toString(), userName,doc.getText(), formattedDateTime);
                     viewDoc.add(version);
                 }
                 return new ResponseEntity<List<ViewDocText>>(viewDoc, HttpStatus.OK);
             } 
     }
+
 }
  
 

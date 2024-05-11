@@ -44,9 +44,7 @@ function TypingArea(props) {
 
   useEffect(() => {
     //Exchange displayed text in case of close history
-    if (openSideHistory) setCurrentText(value);
     if (!openSideHistory) {
-      setValue(currentText);
       setselectedIndex(null);
     }
   }, [openSideHistory]);
@@ -68,7 +66,7 @@ function TypingArea(props) {
         setTitle(data);
       });
     const client = new Client({
-      brokerURL: "ws://localhost:8081/api",
+      brokerURL: "ws://192.168.1.101:8081/api",
       onConnect: () => {
         client.subscribe(`/app/sub/${params.id}/${props.userId}`, (message) => {
           if (JSON.parse(message.body) !== null) {
@@ -86,7 +84,7 @@ function TypingArea(props) {
         client.subscribe(`/topic/public/${params.id}`, (message) => {
           const info = JSON.parse(message.body);
           if (info["userId"] === props.userId) return;
-          
+
           if (info["type"] === "insert") {
             const tempNode = CRDTData.addNode_Id(info["loc"], info["data"]);
             remoteInsert(
@@ -97,19 +95,32 @@ function TypingArea(props) {
             );
           }
           if (info["type"] === "delete") {
-            const deletedNode = CRDTData.deleteNode_Id(info["loc"])
+            const deletedNode = CRDTData.deleteNode_Id(info["loc"]);
             remoteDelete(
               info["loc"] === "-1"
                 ? 0
-                : CRDTData.getInsertIndex_Id(deletedNode.getUUID()),
+                : CRDTData.getInsertIndex_Id(deletedNode.getUUID())
             );
           }
           if (info["type"] === "retain") {
             const tempNode = CRDTData.update_Id(info["loc"], info["data"]);
             remoteRetain(
-              info["loc"] === "-1" ? -1 : CRDTData.getInsertIndex_Id(tempNode.getUUID()),
+              info["loc"] === "-1"
+                ? -1
+                : CRDTData.getInsertIndex_Id(tempNode.getUUID()),
               info["data"]
             );
+          }
+        });
+        client.subscribe(`/topic/public/update/${params.id}`, (message) => {
+          setCRDTData(new CRDT());
+          ref.current.getEditor().setContents(new Delta().insert("\n"), "api");
+          if (JSON.parse(message.body) !== null) {
+            let arr = JSON.parse(message.body);
+            for (let i in arr) {
+              CRDTData.addNode(i - 1, { uuid: arr[i].uuid, data: arr[i].data });
+              remoteInsert(i, arr[i].data);
+            }
           }
         });
         setStompClient(client);
@@ -140,19 +151,16 @@ function TypingArea(props) {
 
   function remoteRetain(index, data) {
     if (ref.current) {
-      console.log(data['bold'])
-      console.log(data['italic'])
-      ref.current.getEditor().editor
-      .formatText(
-        (index <= 0) ? 0 : index - 1,
+      ref.current.getEditor().editor.formatText(
+        index <= 0 ? 0 : index - 1,
         1,
         {
-          'italic': data["italic"] === undefined ? false : data["italic"],
-          'bold': data["bold"] === undefined ? false : data["bold"],
+          italic: data["italic"] === undefined ? false : data["italic"],
+          bold: data["bold"] === undefined ? false : data["bold"],
         },
-        'silent'
+        "silent"
       );
-    } 
+    }
   }
 
   function insert(chars, startIndex, attributes, source) {
@@ -185,19 +193,21 @@ function TypingArea(props) {
     let index = startIndex;
     for (let i = 0; i < length; i++) {
       try {
-        const deletedNode = CRDTData.deleteNode(index+1);
-        if (client.connected && source !== "silent") {
-          client.publish({
-            destination: `/app/${params.id}/chat.sendData`,
-            body: JSON.stringify({
-              type: "delete",
-              loc: deletedNode.getUUID(),
-              userId: props.userId,
-            }),
-          });
+        if (source !== "api") {
+          const deletedNode = CRDTData.deleteNode(index + 1);
+          if (client.connected && source !== "silent") {
+            client.publish({
+              destination: `/app/${params.id}/chat.sendData`,
+              body: JSON.stringify({
+                type: "delete",
+                loc: deletedNode.getUUID(),
+                userId: props.userId,
+              }),
+            });
+          }
         }
       } catch {
-        alert("failed to find relative index");
+        toast.error("failed to find relative index");
       }
     }
   }
@@ -209,7 +219,6 @@ function TypingArea(props) {
         let loc = CRDTData.update(index + i + 1, attributes);
         /* set in backend */
         if (client.connected && source !== "silent") {
-          console.log(index)
           client.publish({
             destination: `/app/${params.id}/chat.sendData`,
             body: JSON.stringify({
@@ -220,8 +229,9 @@ function TypingArea(props) {
             }),
           });
         }
+      } catch {
+        toast.error("failed to find relative index");
       }
-      catch { toast.error("failed to find relative index"); }
     }
   }
 
@@ -232,7 +242,7 @@ function TypingArea(props) {
       insert(chars, index, attributes, source);
     } else if (ops["delete"] != null) {
       let len = ops["delete"];
-      delete_local (index, len, source);
+      delete_local(index, len, source);
     } else if (ops["retain"] != null) {
       let len = ops["retain"];
       let attributes = ops["attributes"];
@@ -263,7 +273,6 @@ function TypingArea(props) {
         } else {
           inspectDelta(delta.ops[0], -1, source);
         }
-        
       }
     }
     setValue(content);
@@ -280,27 +289,14 @@ function TypingArea(props) {
     setopenSideHistory(!openSideHistory);
     setOpac(opac === 1 ? 0 : 1);
     if (client.connected) {
-      setCRDTData(null);
       client.deactivate();
+      setCRDTData(null);
     } else {
-      ref.current.getEditor().editor.setContents(new Delta().insert("\n"));
+      ref.current.getEditor().setContents(new Delta().insert("\n"), "api");
       setCRDTData(new CRDT());
       client.activate();
     }
   };
-
-  useEffect(() => {
-    //Exchange displayed text in case of close history
-    if (openSideHistory) setCurrentText(value);
-    if (!openSideHistory) {
-      setValue(currentText);
-      setselectedIndex(null);
-    }
-  }, [openSideHistory]);
-
-  useEffect(() => {
-    if (currentText) if (!openSideHistory) setCurrentText(null);
-  }, [value]);
 
   async function getDocsHistory() {
     setLoading(true);
@@ -329,11 +325,10 @@ function TypingArea(props) {
 
   const handleSave = () => {
     // Handle the save functionality
-    if(value === null) 
-      {
-        toast.error("No new changes have ocuured");
-        return
-      }
+    if (value === null) {
+      toast.error("No new changes have ocuured");
+      return;
+    }
     const dataToSave = {
       currentUserEmail: props.userId,
       docId: params.id,
@@ -357,6 +352,27 @@ function TypingArea(props) {
         toast.error(error.message || "An error occurred");
       });
     //sendData()
+  };
+
+  const rollback = (props) => {
+    // Handle the save functionality
+    if (value === null) {
+      toast.error("No new changes have ocuured");
+      return;
+    }
+    switchToHistory();
+    const rollbackData = {
+      version: props,
+      docId: params.id,
+    };
+    setTimeout(() => {
+      if (client.connected) {
+        client.publish({
+          destination: `/app/${params.id}/chat.updateData`,
+          body: JSON.stringify(rollbackData),
+        });
+      }
+    }, 50);
   };
 
   const handleDisplayHistoryText = (text) => {
@@ -473,12 +489,10 @@ function TypingArea(props) {
                       {history.editor}
                     </p>
                   </div>
-                  {/* <Button variant="danger" >Restore</Button> */}
                   <p
                     id="setCurrent"
                     onClick={() => {
-                      setopenSideHistory(false);
-                      setCurrentText(history.text);
+                      rollback(history.id);
                     }}
                   >
                     Set current

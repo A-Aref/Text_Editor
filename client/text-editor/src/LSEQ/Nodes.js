@@ -1,11 +1,12 @@
 
+import { v4 as uuidv4 } from 'uuid';
 
 class Node {
     constructor(Id, noCh, data) {
         this.id = Id;
         this.Data = data;
         this.noChildren = noCh;
-        this.uuid = crypto.randomUUID();
+        this.uuid = uuidv4();
         this.Children = new Array(noCh).fill(null);
         this.childrenPos = new Set();
         this.delete = false;
