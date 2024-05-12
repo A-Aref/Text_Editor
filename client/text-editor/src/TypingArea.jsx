@@ -22,6 +22,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import CRDT from "./LSEQ/CRDT";
+import Cursors from "./LSEQ/Cursors";
 
 Quill.register("modules/cursors", QuillCursors);
 const Delta = Quill.import("delta");
@@ -41,6 +42,11 @@ function TypingArea(props) {
   const [currentText, setCurrentText] = useState(null);
   const [CRDTData, setCRDTData] = useState(new CRDT());
   const [Loading, setLoading] = useState(false);
+  const [selectedRange, setSelectedRange] = useState([]);
+  let cursors = [];
+  const [LocalCursor, setLocalCursor] = useState(
+    new Cursors(props.userId, 1, 0, cursors.length)
+  );
 
   useEffect(() => {
     //Exchange displayed text in case of close history
@@ -111,6 +117,9 @@ function TypingArea(props) {
               info["data"]
             );
           }
+          if (info["type"] === "cursor") {
+            updateRemoteCursors(info["data"]);
+          }
         });
         client.subscribe(`/topic/public/update/${params.id}`, (message) => {
           setCRDTData(new CRDT());
@@ -129,6 +138,59 @@ function TypingArea(props) {
     client.activate();
   }, []);
 
+  function updateCursor(index, length) {
+    LocalCursor.updateRange(index, length);
+    if (client.connected) {
+      client.publish({
+        destination: `/app/${params.id}/chat.sendData`,
+        body: JSON.stringify({
+          type: "cursor",
+          data: LocalCursor,
+        }),
+      });
+    }
+  }
+
+  function updateRemoteCursors(remoteCursor) {
+    let cursor = cursors.find((c) => c.userID === remoteCursor.userID);
+    if (cursor) {
+      cursor.updateRange(remoteCursor.index, remoteCursor.length);
+    } else {
+      cursor = new Cursors(
+        remoteCursor.userID,
+        remoteCursor.index,
+        remoteCursor.length,
+        cursors.length
+      );
+      cursors.push(cursor);
+    }
+    if (ref.current) {
+      const quillCursors = ref.current.getEditor().getModule("cursors");
+      const qC = quillCursors.cursors().find((c) => c.id === cursor.userID);
+      if (qC) {
+        quillCursors.moveCursor(qC.id, {
+          index: cursor.index,
+          length: cursor.length,
+        });
+      } else {
+        quillCursors.createCursor(cursor.userID, cursor.name, cursor.color);
+        quillCursors.moveCursor(cursor.userID, {
+          index: cursor.index,
+          length: cursor.length,
+        });
+      }
+    }
+  }
+
+  function handleChangeSelection(range, source, editor) {
+    if (range && range.index !== null) {
+      setSelectedRange(range);
+      updateCursor(range.index, range.length);
+    } else {
+      setSelectedRange([]);
+    }
+  }
+
   function remoteInsert(index, data) {
     if (ref.current) {
       ref.current.getEditor().editor.insertText(
@@ -140,12 +202,22 @@ function TypingArea(props) {
         },
         "silent"
       );
+      if (LocalCursor.index > index) {
+        ref.current.getEditor().setSelection(LocalCursor.index + 1, 0);
+      } else {
+        ref.current.getEditor().setSelection(LocalCursor.index, 0);
+      }
     }
   }
 
   function remoteDelete(index) {
     if (ref.current) {
       ref.current.getEditor().editor.deleteText(index, 1, "silent");
+      if (LocalCursor.index > index) {
+        ref.current.getEditor().setSelection(LocalCursor.index - 1, 0);
+      } else {
+        ref.current.getEditor().setSelection(LocalCursor.index, 0);
+      }
     }
   }
 
@@ -446,6 +518,7 @@ function TypingArea(props) {
           theme="snow"
           value={value}
           onChange={sendData}
+          onChangeSelection={handleChangeSelection}
           modules={{
             cursors: true,
             toolbar: { container: "#my-quill-toolbar" },
