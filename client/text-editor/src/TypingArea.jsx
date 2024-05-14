@@ -337,15 +337,19 @@ function TypingArea(props) {
   };
 
   const switchToHistory = () => {
-    setopenSideHistory(!openSideHistory);
-    setOpac(opac === 1 ? 0 : 1);
-    if (client.connected) {
-      client.deactivate();
-      setCRDTData(null);
+    if (disableH) {
+      toast.info("This document does not have a history yet")
     } else {
-      ref.current.getEditor().setContents(new Delta().insert("\n"), "api");
-      setCRDTData(new CRDT());
-      client.activate();
+      setopenSideHistory(!openSideHistory);
+      setOpac(opac === 1 ? 0 : 1);
+      if (client.connected) {
+        client.deactivate();
+        setCRDTData(null);
+      } else {
+        ref.current.getEditor().setContents(new Delta().insert("\n"), "api");
+        setCRDTData(new CRDT());
+        client.activate();
+      }
     }
   };
 
@@ -359,7 +363,6 @@ function TypingArea(props) {
         //setValue(data[0].text);
         setDisableH(false);
       } else {
-        toast.error("No history avialable");
         setDisableH(true);
       }
       setLoading(false);
@@ -468,7 +471,7 @@ function TypingArea(props) {
           <button
             className=" edit-button"
             onClick={switchToHistory}
-            disabled={disableH}
+            // disabled={disableH}
             aria-controls="example-collapse-text"
             aria-expanded={openSideHistory}
           >
@@ -481,6 +484,7 @@ function TypingArea(props) {
               <RestoreIcon className="saveIcon" sx={{ fontSize: 44 }} />
             )}
           </button>
+
         ) : (
           <></>
         )}
@@ -519,9 +523,8 @@ function TypingArea(props) {
                   id="historyButton"
                   key={index}
                   className={`text-white flex-column d-flex min-w-max
-                  justify-content-center ${
-                    selectedIndex === index ? "bg-primary" : ""
-                  } `}
+                  justify-content-center ${selectedIndex === index ? "bg-primary" : ""
+                    } `}
                   style={{ width: "200px" }}
                 >
                   <p id="historyText" className="fs-5">
