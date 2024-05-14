@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 
 import "./Docs.css";
 
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
@@ -132,6 +135,7 @@ function Docs(props) {
 
   return (
     <div className="md mt-3">
+      <ToastContainer theme='dark'/>
       <Navbar className="mb-4">
         <OverlayTrigger
           placement="bottom"

@@ -19,7 +19,7 @@ class CRDT {
     _addNode(P, Q, data) {
         const id = this.allocate(P, Q);
         const Copyid = [...id];
-        const newNode = new Node(id, this.width * 2 ** id.length, data["data"]);
+        let newNode = new Node(id, this.width * 2 ** id.length, data["data"]);
         if (data["uuid"] !== null) {
             newNode.setUUID(data["uuid"]);
         }
@@ -42,17 +42,20 @@ class CRDT {
             {
                 flag = 1
             }
+            let tempNode = newNode;
             switch (flag) {
                 case 1:
-                    this._addNode(current.getChild(pos), Q, data);
+                    tempNode = this._addNode(current.getChild(pos), Q, data);
                     break;
                 case -1:
-                    this._addNode(P, current.getChild(pos), data);
+                    tempNode = this._addNode(P, current.getChild(pos), data);
                     break;
                 case 0:
                     break;
             }
+            newNode = tempNode
         }
+        
         return newNode;
     }
 
@@ -183,14 +186,14 @@ class CRDT {
                     S[1] = NodeS.getChild(child);
                     return;
                 }
-                if (map.counter === index) {
+                if (map.counter === index && NodeS.getChild(child).getDeleted() !== true) {
                     S[0] = NodeS.getChild(child);
                     map.flag = false;
                 }
-                if(!NodeS.getChild(child).getDeleted())
+                if(NodeS.getChild(child).getDeleted() === false)
                 {
                     map.counter++;
-                }
+                }               
             }
             this.searchTree(NodeS.getChild(child), index, map, S);
         }

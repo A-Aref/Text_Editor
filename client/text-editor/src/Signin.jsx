@@ -27,12 +27,10 @@ function Signin(props) {
     if (email === "" || password === "") {
       toast.error("Please enter both email and password.");
     } else {
-      console.log(password);
       const keyBase64 = "o9szYIOq1rRMiouNhNvaq96lqUvCekxR";   // ay habal bas el backend lazm nfs el 7aga
       var key = CryptoJS.enc.Base64.parse(keyBase64);
       var srcs = CryptoJS.enc.Utf8.parse(password);
       const encryptedPassword = CryptoJS.AES.encrypt(srcs, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7}).toString();
-      console.log(encryptedPassword);
       fetch("/api/v1/users/login", {
         method: "POST",
         headers: {

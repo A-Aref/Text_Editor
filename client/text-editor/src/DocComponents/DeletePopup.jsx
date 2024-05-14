@@ -1,8 +1,9 @@
 
-import React, { useEffect, useState } from "react";
 
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
 
 const DeleteDocument = (props) => {
 
@@ -16,11 +17,11 @@ const DeleteDocument = (props) => {
         }
       })
         .then(response => {
-          if (!response.ok) { alert('Can not Delete the Document'); }
+          if (!response.ok) { toast.error('Can not Delete the Document'); }
           return response.json();
         })
         .then(data => {
-          alert('Document deleted successfully');
+          toast.success('Document deleted successfully');
           props.setDocs(prevDocs => prevDocs.filter(doc => doc.docId !== props.selected.docId));
           props.setShowDelete(false)
         })

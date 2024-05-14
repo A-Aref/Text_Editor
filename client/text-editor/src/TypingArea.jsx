@@ -8,7 +8,6 @@ import IconButton from "@mui/material/IconButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import RestoreIcon from "@mui/icons-material/Restore";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
-import Button from "react-bootstrap/Button";
 import Collapse from "react-bootstrap/Collapse";
 import ReactQuill, { Quill } from "react-quill";
 import QuillCursors, { Cursor } from "quill-cursors";
@@ -42,7 +41,6 @@ function TypingArea(props) {
   const [currentText, setCurrentText] = useState(null);
   const [CRDTData, setCRDTData] = useState(new CRDT());
   const [Loading, setLoading] = useState(false);
-  const [selectedRange, setSelectedRange] = useState([]);
   let cursors = [];
   const [LocalCursor, setLocalCursor] = useState(
     new Cursors(props.userId, 1, 0, cursors.length)
@@ -72,7 +70,7 @@ function TypingArea(props) {
         setTitle(data);
       });
     const client = new Client({
-      brokerURL: "ws://192.168.1.101:8081/api",
+      brokerURL: "ws://192.168.1.104:8081/api",
       onConnect: () => {
         client.subscribe(`/app/sub/${params.id}/${props.userId}`, (message) => {
           if (JSON.parse(message.body) !== null) {
@@ -122,15 +120,7 @@ function TypingArea(props) {
           }
         });
         client.subscribe(`/topic/public/update/${params.id}`, (message) => {
-          setCRDTData(new CRDT());
-          ref.current.getEditor().setContents(new Delta().insert("\n"), "api");
-          if (JSON.parse(message.body) !== null) {
-            let arr = JSON.parse(message.body);
-            for (let i in arr) {
-              CRDTData.addNode(i - 1, { uuid: arr[i].uuid, data: arr[i].data });
-              remoteInsert(i, arr[i].data);
-            }
-          }
+          handleBack()
         });
         setStompClient(client);
       },
@@ -184,10 +174,7 @@ function TypingArea(props) {
 
   function handleChangeSelection(range, source, editor) {
     if (range && range.index !== null) {
-      setSelectedRange(range);
       updateCursor(range.index, range.length);
-    } else {
-      setSelectedRange([]);
     }
   }
 
@@ -245,7 +232,6 @@ function TypingArea(props) {
         italic: attributes === undefined ? false : attributes["italic"],
       };
       const insertedNode = CRDTData.addNode(index, { uuid: null, data: data });
-
       if (client.connected && source !== "silent") {
         client.publish({
           destination: `/app/${params.id}/chat.sendData`,
@@ -350,13 +336,6 @@ function TypingArea(props) {
     setValue(content);
   };
 
-  // if (client.connected && source !== 'silent') {
-  //   client.publish({
-  //     destination: `/app/${params.id}/chat.sendData`,
-  //     body: JSON.stringify(editor.getContents()),
-  //   });
-  // }
-
   const switchToHistory = () => {
     setopenSideHistory(!openSideHistory);
     setOpac(opac === 1 ? 0 : 1);
@@ -385,7 +364,6 @@ function TypingArea(props) {
       }
       setLoading(false);
     } catch (error) {
-      console.error("Error:", error);
       toast.error(error.message || "An error occurred");
     }
   }
@@ -420,7 +398,6 @@ function TypingArea(props) {
         getDocsHistory();
       })
       .catch((error) => {
-        console.error("Error:", error);
         toast.error(error.message || "An error occurred");
       });
     //sendData()
@@ -444,7 +421,7 @@ function TypingArea(props) {
           body: JSON.stringify(rollbackData),
         });
       }
-    }, 50);
+    }, 100);
   };
 
   const handleDisplayHistoryText = (text) => {

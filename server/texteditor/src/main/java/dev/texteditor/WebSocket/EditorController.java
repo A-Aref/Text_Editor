@@ -120,7 +120,6 @@ public class EditorController {
         if (noUsers.get(id) != null) {
 
             noUsers.put(id, noUsers.get(id) - 1);
-            System.out.println(noUsers.get(id));
             if (noUsers.get(id) == 0) {
                 docsController.setDocData(id, docData.get(id).traverseTree_data());
                 docData.put(id, null);

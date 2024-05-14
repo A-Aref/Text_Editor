@@ -4,6 +4,8 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
+import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
 
 const ShareDocument = (props) => {
   const [selectedRoles, setSelectedRoles] = useState([]);
@@ -49,7 +51,7 @@ const ShareDocument = (props) => {
         return response.json();
       })
       .then((data) => {
-        alert("Document shared successfully");
+        toast.success("Document shared successfully");
         props.setShowShare(false);
       })
       .catch((error) => {
